@@ -47,6 +47,7 @@ struct AccountSettingsView: View {
                     Task {
                         await account.connect(token: token)
                         if account.status.isConnected {
+                            await appState.refreshAuthoredPullRequests()
                             token = ""
                             showTokenSheet = false
                         }

@@ -40,8 +40,11 @@ struct PollingSettingsView: View {
                 LabeledContent("Last poll", value: lastPollText)
                 LabeledContent("Rate limit", value: appState.rateLimitSummary)
                 Button("Poll now") {
-                    appState.lastPollDate = Date()
+                    Task {
+                        await appState.refreshAuthoredPullRequests()
+                    }
                 }
+                .disabled(appState.pullRequestSync.isRefreshing)
             }
         }
         .formStyle(.grouped)
