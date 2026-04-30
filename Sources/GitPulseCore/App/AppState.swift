@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import SwiftData
@@ -7,10 +8,13 @@ import SwiftData
 public final class AppState {
     public let container: ModelContainer
     public let gitHubAccount: GitHubAccountService
+    public private(set) var globalShortcuts: GlobalShortcutService?
+    public private(set) var quickPopover: QuickPopoverWindowController?
     public var lastPollDate: Date?
+    public var lastMarkedAllReadDate: Date?
     public var rateLimitSummary: String
 
-    public init(inMemory: Bool = false) {
+    public init(inMemory: Bool = false, enableGlobalShortcuts: Bool = true) {
         gitHubAccount = GitHubAccountService()
 
         let schema = Schema([
@@ -28,10 +32,39 @@ public final class AppState {
         AppSettings.ensureExists(in: container.mainContext)
         NotificationPrefs.ensureDefaults(in: container.mainContext)
         lastPollDate = nil
+        lastMarkedAllReadDate = nil
         rateLimitSummary = "Not checked"
+
+        if enableGlobalShortcuts {
+            configureGlobalShortcuts()
+        }
 
         Task {
             await gitHubAccount.restoreSession()
         }
+    }
+
+    private func configureGlobalShortcuts() {
+        let quickPopover = QuickPopoverWindowController(appState: self, container: container)
+        let globalShortcuts = GlobalShortcutService()
+
+        globalShortcuts.registerDefaults(
+            openPopover: { [weak self] in
+                self?.quickPopover?.toggle()
+            },
+            refresh: { [weak self] in
+                self?.lastPollDate = Date()
+            },
+            markAllRead: { [weak self] in
+                self?.lastMarkedAllReadDate = Date()
+            },
+            openSettings: {
+                NSApp.activate(ignoringOtherApps: true)
+                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+            }
+        )
+
+        self.quickPopover = quickPopover
+        self.globalShortcuts = globalShortcuts
     }
 }
