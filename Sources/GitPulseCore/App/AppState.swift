@@ -11,6 +11,7 @@ public final class AppState {
     public let pullRequestSync: PullRequestSyncService
     public private(set) var globalShortcuts: GlobalShortcutService?
     public private(set) var quickPopover: QuickPopoverWindowController?
+    private var settingsWindowController: SettingsWindowController?
     public var lastPollDate: Date?
     public var lastMarkedAllReadDate: Date?
     public var rateLimitSummary: String
@@ -44,6 +45,7 @@ public final class AppState {
         if enableGlobalShortcuts {
             configureGlobalShortcuts()
         }
+        settingsWindowController = SettingsWindowController(appState: self, container: container)
 
         Task {
             await gitHubAccount.restoreSession()
@@ -64,8 +66,7 @@ public final class AppState {
     }
 
     public func showSettingsWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        settingsWindowController?.show()
     }
 
     private func configureGlobalShortcuts() {

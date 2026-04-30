@@ -15,12 +15,5 @@ struct GitPulseApp: App {
                 .modelContainer(appState.container)
         }
         .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsWindowView()
-                .modelContainer(appState.container)
-                .environment(appState)
-                .frame(minWidth: 560, minHeight: 480)
-        }
     }
 }
