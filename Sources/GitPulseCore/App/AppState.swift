@@ -8,6 +8,7 @@ import SwiftData
 public final class AppState {
     public let container: ModelContainer
     public let gitHubAccount: GitHubAccountService
+    public let pullRequestSync: PullRequestSyncService
     public private(set) var globalShortcuts: GlobalShortcutService?
     public private(set) var quickPopover: QuickPopoverWindowController?
     public var lastPollDate: Date?
@@ -32,6 +33,10 @@ public final class AppState {
 
         AppSettings.ensureExists(in: container.mainContext)
         NotificationPrefs.ensureDefaults(in: container.mainContext)
+        pullRequestSync = PullRequestSyncService(
+            context: container.mainContext,
+            account: gitHubAccount
+        )
         lastPollDate = nil
         lastMarkedAllReadDate = nil
         rateLimitSummary = "Not checked"
@@ -42,6 +47,19 @@ public final class AppState {
 
         Task {
             await gitHubAccount.restoreSession()
+            if gitHubAccount.status.isConnected {
+                await refreshAuthoredPullRequests()
+            }
+        }
+    }
+
+    public func refreshAuthoredPullRequests() async {
+        await pullRequestSync.refreshAuthoredPullRequests()
+        lastPollDate = Date()
+        if let error = pullRequestSync.lastErrorMessage {
+            rateLimitSummary = error
+        } else {
+            rateLimitSummary = "OK"
         }
     }
 
@@ -54,7 +72,9 @@ public final class AppState {
                 self?.quickPopover?.toggle()
             },
             refresh: { [weak self] in
-                self?.lastPollDate = Date()
+                Task {
+                    await self?.refreshAuthoredPullRequests()
+                }
             },
             markAllRead: { [weak self] in
                 self?.lastMarkedAllReadDate = Date()

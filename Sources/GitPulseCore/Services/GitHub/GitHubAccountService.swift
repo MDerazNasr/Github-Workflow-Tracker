@@ -59,6 +59,10 @@ public final class GitHubAccountService {
         }
     }
 
+    public func storedToken() throws -> String? {
+        try tokenStore.loadToken()
+    }
+
     private func verifyAndStore(token: String, shouldSaveToken: Bool) async throws {
         status = .connecting
         errorMessage = nil
