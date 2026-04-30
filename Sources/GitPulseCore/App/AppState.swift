@@ -19,7 +19,8 @@ public final class AppState {
 
         let schema = Schema([
             AppSettings.self,
-            NotificationPrefs.self
+            NotificationPrefs.self,
+            AuthoredPullRequest.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
 
