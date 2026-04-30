@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PopoverActivityView: View {
     @Environment(AppState.self) private var appState
+    let activeFilter: FeedFilter
     @Query(sort: \AuthoredPullRequest.updatedAt, order: .reverse)
     private var pullRequests: [AuthoredPullRequest]
 
@@ -16,16 +17,16 @@ struct PopoverActivityView: View {
         if appState.pullRequestSync.isRefreshing {
             ProgressView("Refreshing PRs")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if pullRequests.isEmpty {
+        } else if visiblePullRequests.isEmpty {
             emptyState
         } else {
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    ForEach(pullRequests) { pullRequest in
-                        PullRequestRow(pullRequest: pullRequest)
-                        if pullRequest.githubID != pullRequests.last?.githubID {
-                            Divider()
-                        }
+                    ForEach(groupedPullRequests, id: \.repository) { group in
+                        RepoPullRequestSection(
+                            repositoryName: group.repository,
+                            pullRequests: group.pullRequests
+                        )
                     }
                 }
             }
@@ -49,7 +50,7 @@ struct PopoverActivityView: View {
     }
 
     private var emptyTitle: String {
-        appState.gitHubAccount.status.isConnected ? "No open PRs" : "Connect GitHub"
+        appState.gitHubAccount.status.isConnected ? "all clear" : "connect github"
     }
 
     private var emptyMessage: String {
@@ -57,8 +58,24 @@ struct PopoverActivityView: View {
             return error
         }
         if appState.gitHubAccount.status.isConnected {
-            return "Open pull requests you authored will appear here after refresh."
+            return activeFilter == .prs || activeFilter == .all ? "no unread events" : "no \(activeFilter.label) events"
         }
         return "Connect your account in Settings to show your open pull requests."
+    }
+
+    private var visiblePullRequests: [AuthoredPullRequest] {
+        switch activeFilter {
+        case .all, .prs:
+            return pullRequests
+        case .issues, .cicd, .mentions:
+            return []
+        }
+    }
+
+    private var groupedPullRequests: [(repository: String, pullRequests: [AuthoredPullRequest])] {
+        let grouped = Dictionary(grouping: visiblePullRequests, by: \.repositoryName)
+        return grouped
+            .map { (repository: $0.key, pullRequests: $0.value.sorted { $0.updatedAt > $1.updatedAt }) }
+            .sorted { $0.repository < $1.repository }
     }
 }

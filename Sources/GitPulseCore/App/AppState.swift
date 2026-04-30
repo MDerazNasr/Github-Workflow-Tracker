@@ -63,6 +63,11 @@ public final class AppState {
         }
     }
 
+    public func showSettingsWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+
     private func configureGlobalShortcuts() {
         let quickPopover = QuickPopoverWindowController(appState: self, container: container)
         let globalShortcuts = GlobalShortcutService()
@@ -80,8 +85,7 @@ public final class AppState {
                 self?.lastMarkedAllReadDate = Date()
             },
             openSettings: {
-                NSApp.activate(ignoringOtherApps: true)
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                self.showSettingsWindow()
             }
         )
 

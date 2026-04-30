@@ -1,12 +1,11 @@
 import Testing
 @testable import GitPulseCore
 
-@Suite("Popover tabs")
+@Suite("Popover filters")
 struct PopoverTabTests {
-    @Test("popover exposes activity and compact settings tabs")
-    func popoverTabsMatchUISplit() {
-        #expect(PopoverTab.allCases == [.activity, .settings])
-        #expect(PopoverTab.activity.label == "Activity")
-        #expect(PopoverTab.settings.label == "Settings")
+    @Test("popover exposes corrected activity filters")
+    func popoverFiltersMatchSpec() {
+        #expect(FeedFilter.allCases == [.all, .prs, .issues, .cicd, .mentions])
+        #expect(FeedFilter.cicd.label == "ci/cd")
     }
 }
