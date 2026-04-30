@@ -32,5 +32,6 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 
 ## Current Integration Limits
 
-- GitHub authentication, polling, webhooks, Sparkle updates, and global shortcut registration are represented by settings surfaces but still need concrete service implementations.
+- GitHub authentication supports personal access token verification and Keychain storage.
+- Polling, webhooks, Sparkle updates, and global shortcut registration are represented by settings surfaces but still need concrete service implementations.
 - Shortcut fields are display strings only until the KeyboardShortcuts package is integrated.
