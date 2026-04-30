@@ -14,42 +14,77 @@ struct AdvancedSettingsView: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Logging") {
-                Picker("Log level", selection: $settings.logLevel) {
-                    ForEach(LogLevel.allCases) {
-                        Text($0.displayName).tag($0.rawValue)
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel(text: "logging", isFirst: true)
+            SettingsGroup {
+                SettingsRow(label: "Log level") {
+                    DarkPicker(
+                        options: LogLevel.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.logLevel
+                    )
+                }
+                SettingsRow(label: "Write logs to file", subtitle: "~/Library/Logs/GitPulse/gitpulse.log") {
+                    DarkToggle(isOn: $settings.writeLogsToFile)
+                }
+                SettingsRow(label: "Open log file", hasDivider: false) {
+                    StandardButton(title: "Open") {
+                        NSWorkspace.shared.open(logFileURL)
                     }
                 }
-                Toggle("Write logs to file", isOn: $settings.writeLogsToFile)
-                Button("Open log file") {
-                    NSWorkspace.shared.open(logFileURL)
+            }
+
+            SectionLabel(text: "developer")
+            SettingsGroup {
+                SettingsRow(label: "Show API request log", subtitle: "Overlay showing every GitHub API call in real time") {
+                    DarkToggle(isOn: $settings.showAPIRequestLog)
+                }
+                SettingsRow(label: "Simulate slow network", subtitle: "Adds 2s latency to all API calls") {
+                    DarkToggle(isOn: $settings.simulateSlowNetwork)
+                }
+                SettingsRow(label: "Force CI failure state", subtitle: "Overrides all CI status to failing, tests icon color", hasDivider: false) {
+                    DarkToggle(isOn: $settings.forceCIFailureState)
                 }
             }
 
-            Section("Developer") {
-                Toggle("Show API request log", isOn: $settings.showAPIRequestLog)
-                Toggle("Simulate slow network", isOn: $settings.simulateSlowNetwork)
-                Toggle("Force CI failure state", isOn: $settings.forceCIFailureState)
+            SectionLabel(text: "cache")
+            SettingsGroup {
+                SettingsRow(label: "Cache size") {
+                    valueText("0 KB")
+                }
+                SettingsRow(label: "Clear cache", hasDivider: false) {
+                    DangerButton(title: "Clear") {}
+                }
             }
 
-            Section("Reset") {
-                Button("Reset all settings to defaults", role: .destructive) {
+            SectionLabel(text: "reset")
+            SettingsGroup {
+                DangerRow(label: "Reset all settings to defaults") {
                     showResetConfirmation = true
                 }
-                Button("Delete all data and sign out", role: .destructive) {
+                DangerRow(label: "Delete all data and sign out", hasDivider: false) {
                     showFullResetConfirmation = true
                 }
             }
 
-            Section("About") {
-                LabeledContent("Version", value: appVersion)
-                Toggle("Auto-update", isOn: $settings.autoUpdate)
-                Button("Check for updates") {}
-                Link("View changelog", destination: changelogURL)
+            SectionLabel(text: "about")
+            SettingsGroup {
+                SettingsRow(label: "Version") {
+                    valueText(appVersion)
+                }
+                SettingsRow(label: "Auto-update") {
+                    DarkToggle(isOn: $settings.autoUpdate)
+                }
+                SettingsRow(label: "Check for updates") {
+                    StandardButton(title: "Check now") {}
+                }
+                SettingsRow(label: "View changelog", hasDivider: false) {
+                    StandardButton(title: "Open ↗") {
+                        NSWorkspace.shared.open(changelogURL)
+                    }
+                }
             }
         }
-        .formStyle(.grouped)
+        .padding(.vertical, 20)
         .confirmationDialog("Reset all settings?", isPresented: $showResetConfirmation) {
             Button("Reset Settings", role: .destructive) {
                 settings.resetToDefaults()
@@ -73,5 +108,41 @@ struct AdvancedSettingsView: View {
 
     private var changelogURL: URL {
         URL(string: "https://github.com/")!
+    }
+
+    private func valueText(_ value: String) -> some View {
+        Text(value)
+            .font(GitPulseText.mono(12))
+            .foregroundColor(GitPulseColors.textSecondary)
+    }
+}
+
+private struct DangerRow: View {
+    let label: String
+    var hasDivider = true
+    let action: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button(action: action) {
+                HStack {
+                    Text(label)
+                        .font(GitPulseText.mono(12))
+                        .foregroundColor(GitPulseColors.red)
+                    Spacer()
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .frame(minHeight: 44)
+            }
+            .buttonStyle(.plain)
+
+            if hasDivider {
+                Rectangle()
+                    .fill(GitPulseColors.dividerStrong)
+                    .frame(height: 0.5)
+                    .padding(.leading, 14)
+            }
+        }
     }
 }
