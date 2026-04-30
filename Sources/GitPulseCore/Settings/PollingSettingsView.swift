@@ -12,42 +12,78 @@ struct PollingSettingsView: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Polling") {
-                Picker("Refresh interval", selection: $settings.pollIntervalSeconds) {
-                    ForEach(PollInterval.allCases) {
-                        Text($0.displayName).tag($0.seconds)
-                    }
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel(text: "polling", isFirst: true)
+            SettingsGroup {
+                SettingsRow(label: "Refresh interval") {
+                    DarkPicker(
+                        options: PollInterval.allCases.map { SelectOption(id: $0.seconds, label: $0.displayName) },
+                        selection: $settings.pollIntervalSeconds
+                    )
                 }
-                Toggle("Pause on battery", isOn: $settings.pausePollingOnBattery)
-                Toggle("Pause when offline", isOn: $settings.pausePollingWhenOffline)
-                Toggle("Back off on rate limit", isOn: $settings.backoffOnRateLimit)
-            }
-
-            Section("Webhook Receiver") {
-                Toggle("Enable webhook receiver", isOn: $settings.webhookEnabled)
-                if settings.webhookEnabled {
-                    LabeledContent("Port") {
-                        TextField("Port", value: $settings.webhookPort, format: .number)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
-                    }
-                    Toggle("Verify signatures", isOn: $settings.verifyWebhookSignatures)
+                SettingsRow(label: "Pause on battery", subtitle: "Switch to manual refresh when unplugged") {
+                    DarkToggle(isOn: $settings.pausePollingOnBattery)
+                }
+                SettingsRow(label: "Pause when offline") {
+                    DarkToggle(isOn: $settings.pausePollingWhenOffline)
+                }
+                SettingsRow(label: "Back off on rate limit", subtitle: "Double the interval when GitHub returns 403", hasDivider: false) {
+                    DarkToggle(isOn: $settings.backoffOnRateLimit)
                 }
             }
 
-            Section("Status") {
-                LabeledContent("Last poll", value: lastPollText)
-                LabeledContent("Rate limit", value: appState.rateLimitSummary)
-                Button("Poll now") {
-                    Task {
-                        await appState.refreshAuthoredPullRequests()
-                    }
+            SectionLabel(text: "webhook receiver")
+            SettingsGroup {
+                SettingsRow(label: "Enable webhook receiver", subtitle: "Runs a local HTTP server for instant CI events") {
+                    DarkToggle(isOn: $settings.webhookEnabled)
                 }
-                .disabled(appState.pullRequestSync.isRefreshing)
+                SettingsRow(label: "Port") {
+                    SettingsTextInput(placeholder: "9876", text: webhookPortText)
+                        .frame(width: 70)
+                        .multilineTextAlignment(.trailing)
+                }
+                SettingsRow(label: "Verify webhook signatures", subtitle: "Reject payloads with invalid HMAC signatures", hasDivider: false) {
+                    DarkToggle(isOn: $settings.verifyWebhookSignatures)
+                }
             }
+            SettingsHint(text: "Configure your GitHub App webhook to forward to localhost:9876. Use smee.io in development.")
+
+            SectionLabel(text: "status")
+            SettingsGroup {
+                SettingsRow(label: "Last successful poll") {
+                    statusText(lastPollText)
+                }
+                SettingsRow(label: "Rate limit remaining", hasDivider: false) {
+                    statusText(appState.rateLimitSummary)
+                }
+            }
+            StandardButton(title: appState.pullRequestSync.isRefreshing ? "Polling" : "Poll now") {
+                Task {
+                    await appState.refreshAuthoredPullRequests()
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
+            .disabled(appState.pullRequestSync.isRefreshing)
         }
-        .formStyle(.grouped)
+        .padding(.vertical, 20)
+    }
+
+    private var webhookPortText: Binding<String> {
+        Binding(
+            get: { String(settings.webhookPort) },
+            set: { value in
+                if let port = Int(value) {
+                    settings.webhookPort = port
+                }
+            }
+        )
+    }
+
+    private func statusText(_ value: String) -> some View {
+        Text(value)
+            .font(GitPulseText.mono(12))
+            .foregroundColor(GitPulseColors.textSecondary)
     }
 
     private var lastPollText: String {
