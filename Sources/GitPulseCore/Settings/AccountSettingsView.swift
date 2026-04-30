@@ -9,32 +9,95 @@ struct AccountSettingsView: View {
     var body: some View {
         let account = appState.gitHubAccount
 
-        Form {
-            Section("GitHub") {
-                LabeledContent("Status", value: account.status.displayText)
-                if let user = connectedUser {
-                    Link("Open \(user.login) on GitHub", destination: user.htmlURL)
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel(text: "connected as", isFirst: true)
+            SettingsGroup {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(GitPulseColors.blueBase.opacity(0.19))
+                        Circle()
+                            .stroke(GitPulseColors.blueBase.opacity(0.31), lineWidth: 0.5)
+                        Text(userInitials)
+                            .font(GitPulseText.mono(11))
+                            .foregroundColor(GitPulseColors.blue)
+                    }
+                    .frame(width: 30, height: 30)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(account.status.displayText)
+                            .font(GitPulseText.mono(12))
+                            .foregroundColor(GitPulseColors.textPrimary)
+                        Text("personal access token")
+                            .font(GitPulseText.mono(10))
+                            .foregroundColor(GitPulseColors.textMuted)
+                    }
+                    Spacer()
+                    StatusDot(color: account.status.isConnected ? GitPulseColors.green : GitPulseColors.red, size: 6)
                 }
-                Button(connectButtonTitle) {
-                    showTokenSheet = true
-                }
-                .disabled(account.status == .connecting)
-                Button("Sign Out", role: .destructive) {
-                    account.signOut()
-                }
-                    .disabled(!account.status.isConnected)
-                if let message = account.errorMessage {
-                    Text(message)
-                        .foregroundStyle(.red)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+
+                Rectangle()
+                    .fill(GitPulseColors.dividerStrong)
+                    .frame(height: 0.5)
+                    .padding(.leading, 14)
+
+                SettingsRow(label: "Rate limit", hasDivider: false) {
+                    Text(appState.rateLimitSummary)
+                        .font(GitPulseText.mono(12))
+                        .foregroundColor(GitPulseColors.textSecondary)
                 }
             }
 
-            Section("Token") {
-                Text("Use a GitHub personal access token with access to the repositories you want GitPulse to track.")
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                DangerButton(title: "Sign out") {
+                    account.signOut()
+                }
+                StandardButton(title: connectedUser == nil ? "Connect" : "Reconnect") {
+                    showTokenSheet = true
+                }
+                if let user = connectedUser {
+                    StandardButton(title: "Open profile ↗") {
+                        NSWorkspace.shared.open(user.htmlURL)
+                    }
+                }
             }
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
+
+            if let message = account.errorMessage {
+                SettingsHint(text: message)
+            }
+
+            SectionLabel(text: "personal access token")
+            SettingsGroup {
+                VStack(alignment: .leading, spacing: 8) {
+                    SettingsSecureInput(placeholder: "ghp_xxxxxxxxxxxxxxxxxxxx", text: $token)
+                    HStack(spacing: 8) {
+                        StandardButton(title: "Paste token") {
+                            pasteToken()
+                        }
+                        StandardButton(title: "Save token") {
+                            Task {
+                                await account.connect(token: token)
+                                if account.status.isConnected {
+                                    await appState.refreshAuthoredPullRequests()
+                                    token = ""
+                                }
+                            }
+                        }
+                        DangerButton(title: "Clear token") {
+                            token = ""
+                        }
+                    }
+                }
+                .padding(14)
+            }
+            SettingsHint(text: "Generate a classic PAT with scopes: repo, notifications, read:org.")
         }
-        .formStyle(.grouped)
+        .padding(.vertical, 20)
+        .background(GitPulseColors.background)
         .sheet(isPresented: $showTokenSheet) {
             TokenEntrySheet(
                 token: $token,
@@ -69,6 +132,20 @@ struct AccountSettingsView: View {
     private var connectButtonTitle: String {
         appState.gitHubAccount.status.isConnected ? "Reconnect GitHub Account" : "Connect GitHub Account"
     }
+
+    private var userInitials: String {
+        guard let user = connectedUser else {
+            return "GP"
+        }
+        return String(user.login.prefix(2)).uppercased()
+    }
+
+    private func pasteToken() {
+        guard let pastedToken = NSPasteboard.general.string(forType: .string) else {
+            return
+        }
+        token = pastedToken.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 private struct TokenEntrySheet: View {
@@ -82,36 +159,31 @@ private struct TokenEntrySheet: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Connect GitHub Account")
                 .font(.headline)
+                .foregroundColor(GitPulseColors.textPrimary)
 
-            SecureField("Personal access token", text: $token)
-                .textFieldStyle(.roundedBorder)
+            SettingsSecureInput(placeholder: "Personal access token", text: $token)
                 .focused($tokenFieldFocused)
 
             Text("The token is verified with GitHub and stored in macOS Keychain.")
-                .foregroundStyle(.secondary)
+                .font(GitPulseText.mono(11))
+                .foregroundColor(GitPulseColors.textSecondary)
 
             HStack {
-                Button("Paste Token") {
+                StandardButton(title: "Paste Token") {
                     pasteToken()
                 }
                 .disabled(isConnecting)
                 Spacer()
-                Button("Cancel", action: onCancel)
-                    .disabled(isConnecting)
-                Button {
+                StandardButton(title: "Cancel", action: onCancel)
+                StandardButton(title: isConnecting ? "Connecting" : "Connect") {
                     onConnect()
-                } label: {
-                    if isConnecting {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Text("Connect")
-                    }
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(isConnecting || token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
+        .padding(20)
+        .background(GitPulseColors.background)
         .onAppear {
             tokenFieldFocused = true
         }
