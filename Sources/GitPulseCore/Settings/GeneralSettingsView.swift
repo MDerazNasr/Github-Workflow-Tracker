@@ -12,48 +12,88 @@ struct GeneralSettingsView: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Startup") {
-                Toggle("Launch at login", isOn: $settings.launchAtLogin)
-                Toggle("Show in Dock", isOn: $settings.showInDock)
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel(text: "startup", isFirst: true)
+            SettingsGroup {
+                SettingsRow(label: "Launch at login") {
+                    DarkToggle(isOn: $settings.launchAtLogin)
+                }
+                SettingsRow(
+                    label: "Show in Dock",
+                    subtitle: "Show a Dock icon in addition to the menu bar"
+                ) {
+                    DarkToggle(isOn: $settings.showInDock)
+                }
                     .onChange(of: settings.showInDock) { _, show in
                         NSApp.setActivationPolicy(show ? .regular : .accessory)
                     }
-                Toggle("Reopen last view on launch", isOn: $settings.reopenLastViewOnLaunch)
-            }
-
-            Section("Behavior") {
-                Picker("Open links in", selection: $settings.openLinksIn) {
-                    ForEach(OpenLinksIn.allCases) {
-                        Text($0.displayName).tag($0.rawValue)
-                    }
-                }
-                Toggle("Mark as read on open", isOn: $settings.markAsReadOnOpen)
-                Toggle("Close popover after opening link", isOn: $settings.closePopoverAfterOpeningLink)
-                Toggle("Group activity by repository", isOn: $settings.groupByRepo)
-                Picker("Default tab", selection: $settings.defaultTab) {
-                    ForEach(AppDefaultTab.allCases) {
-                        Text($0.displayName).tag($0.rawValue)
-                    }
+                SettingsRow(label: "Reopen last view on launch", hasDivider: false) {
+                    DarkToggle(isOn: $settings.reopenLastViewOnLaunch)
                 }
             }
 
-            Section("Data") {
-                Picker("Keep read items for", selection: $settings.retentionDaysRead) {
-                    Text("1 day").tag(1)
-                    Text("7 days").tag(7)
-                    Text("30 days").tag(30)
-                    Text("90 days").tag(90)
-                    Text("Forever").tag(0)
+            SectionLabel(text: "behavior")
+            SettingsGroup {
+                SettingsRow(label: "Open links in") {
+                    DarkPicker(
+                        options: OpenLinksIn.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.openLinksIn
+                    )
                 }
-                Picker("Keep dismissed items for", selection: $settings.retentionDaysDismissed) {
-                    Text("Never").tag(0)
-                    Text("7 days").tag(7)
-                    Text("30 days").tag(30)
+                SettingsRow(label: "Mark as read on open") {
+                    DarkToggle(isOn: $settings.markAsReadOnOpen)
                 }
-                Toggle("Demo mode", isOn: $settings.demoMode)
+                SettingsRow(label: "Close popover after opening link") {
+                    DarkToggle(isOn: $settings.closePopoverAfterOpeningLink)
+                }
+                SettingsRow(
+                    label: "Group activity by repository",
+                    subtitle: "Off shows a single chronological feed"
+                ) {
+                    DarkToggle(isOn: $settings.groupByRepo)
+                }
+                SettingsRow(label: "Default tab", hasDivider: false) {
+                    DarkPicker(
+                        options: AppDefaultTab.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.defaultTab
+                    )
+                }
             }
+
+            SectionLabel(text: "data")
+            SettingsGroup {
+                SettingsRow(label: "Keep read items for") {
+                    DarkPicker(
+                        options: [
+                            SelectOption(id: 1, label: "1 day"),
+                            SelectOption(id: 7, label: "7 days"),
+                            SelectOption(id: 30, label: "30 days"),
+                            SelectOption(id: 90, label: "90 days"),
+                            SelectOption(id: 0, label: "Forever")
+                        ],
+                        selection: $settings.retentionDaysRead
+                    )
+                }
+                SettingsRow(label: "Keep dismissed items for") {
+                    DarkPicker(
+                        options: [
+                            SelectOption(id: 0, label: "Never"),
+                            SelectOption(id: 7, label: "7 days"),
+                            SelectOption(id: 30, label: "30 days")
+                        ],
+                        selection: $settings.retentionDaysDismissed
+                    )
+                }
+                SettingsRow(
+                    label: "Demo mode",
+                    subtitle: "Use built-in sample data, no GitHub account needed",
+                    hasDivider: false
+                ) {
+                    DarkToggle(isOn: $settings.demoMode)
+                }
+            }
+            SettingsHint(text: "Demo mode loads built-in sample repos and events so the app is fully navigable without an account.")
         }
-        .formStyle(.grouped)
+        .padding(.vertical, 20)
     }
 }
