@@ -9,7 +9,8 @@ struct NotificationPrefsTests {
     func ensureDefaultsCreatesRows() throws {
         let schema = Schema([
             AppSettings.self,
-            NotificationPrefs.self
+            NotificationPrefs.self,
+            AuthoredPullRequest.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])

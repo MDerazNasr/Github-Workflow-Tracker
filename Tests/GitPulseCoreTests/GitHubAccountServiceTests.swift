@@ -91,6 +91,10 @@ private final class StubGitHubAPI: GitHubAPI, @unchecked Sendable {
         requestedTokens.append(token)
         return try result.get()
     }
+
+    func authoredOpenPullRequests(token: String, limit: Int) async throws -> [GitHubPullRequestSummary] {
+        []
+    }
 }
 
 private extension GitHubUser {

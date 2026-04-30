@@ -60,7 +60,8 @@ struct AppSettingsTests {
     private func makeContainer() throws -> ModelContainer {
         let schema = Schema([
             AppSettings.self,
-            NotificationPrefs.self
+            NotificationPrefs.self,
+            AuthoredPullRequest.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
