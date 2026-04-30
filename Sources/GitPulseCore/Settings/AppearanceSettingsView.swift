@@ -12,69 +12,119 @@ struct AppearanceSettingsView: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Theme") {
-                Picker("Appearance", selection: $settings.appearanceMode) {
-                    ForEach(AppAppearance.allCases) {
-                        Text($0.displayName).tag($0.rawValue)
-                    }
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel(text: "theme", isFirst: true)
+            SettingsGroup {
+                SettingsRow(label: "Appearance") {
+                    DarkPicker(
+                        options: AppAppearance.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.appearanceMode
+                    )
                 }
                 .onChange(of: settings.appearanceMode) { _, mode in
                     applyAppearance(mode)
                 }
-                Picker("Accent color", selection: $settings.accentColor) {
-                    ForEach(AppAccentColor.allCases) {
-                        Text($0.displayName).tag($0.rawValue)
+                SettingsRow(label: "Accent color") {
+                    DarkPicker(
+                        options: AppAccentColor.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.accentColor
+                    )
+                }
+                SettingsRow(
+                    label: "Popover vibrancy",
+                    subtitle: "Blur and tint the popover background",
+                    hasDivider: false
+                ) {
+                    DarkToggle(isOn: $settings.popoverVibrancy)
+                }
+            }
+
+            SectionLabel(text: "typography")
+            SettingsGroup {
+                SettingsRow(label: "Font") {
+                    DarkPicker(
+                        options: [
+                            SelectOption(id: "sf-mono", label: "SF Mono"),
+                            SelectOption(id: "menlo", label: "Menlo"),
+                            SelectOption(id: "fira-code", label: "Fira Code"),
+                            SelectOption(id: "jetbrains-mono", label: "JetBrains Mono")
+                        ],
+                        selection: $settings.fontName
+                    )
+                }
+                SettingsRow(label: "Font size") {
+                    HStack(spacing: 8) {
+                        Slider(
+                            value: Binding(
+                                get: { Double(settings.fontSize) },
+                                set: { settings.fontSize = Int($0) }
+                            ),
+                            in: 11...16,
+                            step: 1
+                        )
+                        .frame(width: 100)
+                        .tint(GitPulseColors.green)
+                        Text("\(settings.fontSize)pt")
+                            .font(GitPulseText.mono(12))
+                            .foregroundColor(GitPulseColors.textRow)
+                            .frame(width: 32, alignment: .trailing)
                     }
                 }
-                Toggle("Popover vibrancy", isOn: $settings.popoverVibrancy)
-            }
-
-            Section("Typography") {
-                Picker("Font", selection: $settings.fontName) {
-                    Text("SF Mono").tag("sf-mono")
-                    Text("Menlo").tag("menlo")
-                    Text("Fira Code").tag("fira-code")
-                    Text("JetBrains Mono").tag("jetbrains-mono")
-                    Text("Cascadia Code").tag("cascadia-code")
-                }
-                Slider(
-                    value: Binding(
-                        get: { Double(settings.fontSize) },
-                        set: { settings.fontSize = Int($0) }
-                    ),
-                    in: 11...16,
-                    step: 1
+                SettingsRow(
+                    label: "Dense layout",
+                    subtitle: "Reduce padding to show more items without scrolling",
+                    hasDivider: false
                 ) {
-                    Text("Font size")
-                } minimumValueLabel: {
-                    Text("11")
-                } maximumValueLabel: {
-                    Text("16")
+                    DarkToggle(isOn: $settings.denseLayout)
                 }
-                Toggle("Dense layout", isOn: $settings.denseLayout)
             }
 
-            Section("Popover Display") {
-                Picker("Width", selection: $settings.popoverWidth) {
-                    Text("300").tag(300)
-                    Text("360").tag(360)
-                    Text("420").tag(420)
-                    Text("480").tag(480)
+            SectionLabel(text: "popover")
+            SettingsGroup {
+                SettingsRow(label: "Popover width") {
+                    HStack(spacing: 8) {
+                        Slider(
+                            value: Binding(
+                                get: { Double(settings.popoverWidth) },
+                                set: { settings.popoverWidth = Int($0) }
+                            ),
+                            in: 300...480,
+                            step: 10
+                        )
+                        .frame(width: 100)
+                        .tint(GitPulseColors.green)
+                        Text("\(settings.popoverWidth)pt")
+                            .font(GitPulseText.mono(12))
+                            .foregroundColor(GitPulseColors.textRow)
+                            .frame(width: 44, alignment: .trailing)
+                    }
                 }
-                Picker("Maximum visible items", selection: $settings.maxVisibleItems) {
-                    Text("10").tag(10)
-                    Text("20").tag(20)
-                    Text("30").tag(30)
-                    Text("Unlimited").tag(0)
+                SettingsRow(label: "Max visible items") {
+                    DarkPicker(
+                        options: [
+                            SelectOption(id: 10, label: "10"),
+                            SelectOption(id: 20, label: "20"),
+                            SelectOption(id: 30, label: "30"),
+                            SelectOption(id: 0, label: "Unlimited")
+                        ],
+                        selection: $settings.maxVisibleItems
+                    )
                 }
-                Toggle("Relative timestamps", isOn: $settings.showRelativeTimestamps)
-                Toggle("Author avatars", isOn: $settings.showAuthorAvatars)
-                Toggle("CI branch name", isOn: $settings.showCIBranchName)
-                Toggle("Commit SHA", isOn: $settings.showCommitSHA)
+                SettingsRow(label: "Show relative timestamps", subtitle: "Off shows exact date and time") {
+                    DarkToggle(isOn: $settings.showRelativeTimestamps)
+                }
+                SettingsRow(label: "Show author avatars") {
+                    DarkToggle(isOn: $settings.showAuthorAvatars)
+                }
+                SettingsRow(label: "Show CI branch name") {
+                    DarkToggle(isOn: $settings.showCIBranchName)
+                }
+                SettingsRow(label: "Show commit SHA on CI rows", hasDivider: false) {
+                    DarkToggle(isOn: $settings.showCommitSHA)
+                }
             }
         }
-        .formStyle(.grouped)
+        .padding(.vertical, 20)
     }
 
     private func applyAppearance(_ mode: String) {
