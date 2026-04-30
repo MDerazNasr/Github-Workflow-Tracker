@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct AccountSettingsView: View {
@@ -71,6 +72,7 @@ struct AccountSettingsView: View {
 
 private struct TokenEntrySheet: View {
     @Binding var token: String
+    @FocusState private var tokenFieldFocused: Bool
     let isConnecting: Bool
     let onCancel: () -> Void
     let onConnect: () -> Void
@@ -82,11 +84,16 @@ private struct TokenEntrySheet: View {
 
             SecureField("Personal access token", text: $token)
                 .textFieldStyle(.roundedBorder)
+                .focused($tokenFieldFocused)
 
             Text("The token is verified with GitHub and stored in macOS Keychain.")
                 .foregroundStyle(.secondary)
 
             HStack {
+                Button("Paste Token") {
+                    pasteToken()
+                }
+                .disabled(isConnecting)
                 Spacer()
                 Button("Cancel", action: onCancel)
                     .disabled(isConnecting)
@@ -104,5 +111,15 @@ private struct TokenEntrySheet: View {
                 .disabled(isConnecting || token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
+        .onAppear {
+            tokenFieldFocused = true
+        }
+    }
+
+    private func pasteToken() {
+        guard let pastedToken = NSPasteboard.general.string(forType: .string) else {
+            return
+        }
+        token = pastedToken.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
