@@ -36,11 +36,13 @@ struct PopoverActivityView: View {
     private var emptyState: some View {
         VStack(spacing: 8) {
             Text(emptyTitle)
-                .font(.headline)
+                .font(GitPulseText.mono(13))
+                .foregroundColor(GitPulseColors.textFaint)
             Text(emptyMessage)
-                .foregroundStyle(.secondary)
+                .font(GitPulseText.mono(11))
+                .foregroundColor(GitPulseColors.textGhost)
                 .multilineTextAlignment(.center)
-            Button("Refresh") {
+            StandardButton(title: "Refresh") {
                 Task {
                     await appState.refreshAuthoredPullRequests()
                 }

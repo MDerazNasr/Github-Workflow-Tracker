@@ -158,7 +158,7 @@ private struct TokenEntrySheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Connect GitHub Account")
-                .font(.headline)
+                .font(GitPulseText.mono(13))
                 .foregroundColor(GitPulseColors.textPrimary)
 
             SettingsSecureInput(placeholder: "Personal access token", text: $token)
