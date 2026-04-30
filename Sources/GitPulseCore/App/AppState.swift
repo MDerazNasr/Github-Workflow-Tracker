@@ -6,10 +6,13 @@ import SwiftData
 @Observable
 public final class AppState {
     public let container: ModelContainer
+    public let gitHubAccount: GitHubAccountService
     public var lastPollDate: Date?
     public var rateLimitSummary: String
 
     public init(inMemory: Bool = false) {
+        gitHubAccount = GitHubAccountService()
+
         let schema = Schema([
             AppSettings.self,
             NotificationPrefs.self
@@ -26,5 +29,9 @@ public final class AppState {
         NotificationPrefs.ensureDefaults(in: container.mainContext)
         lastPollDate = nil
         rateLimitSummary = "Not checked"
+
+        Task {
+            await gitHubAccount.restoreSession()
+        }
     }
 }
