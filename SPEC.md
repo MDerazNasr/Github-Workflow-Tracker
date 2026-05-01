@@ -38,4 +38,5 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - GitHub authentication supports personal access token verification and Keychain storage.
 - Authored open pull requests are fetched from GitHub GraphQL and stored in SwiftData for the menu popover.
 - Default global shortcuts are registered with native macOS hotkey APIs while GitPulse is running.
-- Webhooks, Sparkle updates, notifications delivery, and customizable shortcut recording still need concrete service implementations.
+- Global shortcut mappings can be recorded in the Shortcuts settings panel and are persisted in `AppSettings`.
+- Webhooks, Sparkle updates, and notifications delivery still need concrete service implementations.
