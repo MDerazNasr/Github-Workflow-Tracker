@@ -53,6 +53,8 @@ struct AdvancedSettingsView: View {
         .confirmationDialog("Reset all settings?", isPresented: $showResetConfirmation) {
             Button("Reset Settings", role: .destructive) {
                 settings.resetToDefaults()
+                appState.applyRuntimeSettings(settings)
+                appState.reloadGlobalShortcuts()
             }
         }
         .confirmationDialog("Clear stored pull requests?", isPresented: $showClearPullRequestsConfirmation) {
@@ -63,6 +65,8 @@ struct AdvancedSettingsView: View {
         .confirmationDialog("Delete all data and sign out?", isPresented: $showFullResetConfirmation) {
             Button("Delete Data", role: .destructive) {
                 settings.resetToDefaults()
+                appState.applyRuntimeSettings(settings)
+                appState.reloadGlobalShortcuts()
                 clearPullRequests()
                 appState.gitHubAccount.signOut()
             }

@@ -42,6 +42,9 @@ public final class AppState {
         lastMarkedAllReadDate = nil
         rateLimitSummary = "Not checked"
 
+        if let settings = currentSettings() {
+            applyRuntimeSettings(settings)
+        }
         statusItemPopover = StatusItemPopoverController(appState: self, container: container)
         if enableGlobalShortcuts {
             configureGlobalShortcuts()
@@ -77,9 +80,13 @@ public final class AppState {
         configureGlobalShortcuts()
     }
 
+    func applyRuntimeSettings(_ settings: AppSettings) {
+        NSApp.setActivationPolicy(settings.showInDock ? .regular : .accessory)
+    }
+
     private func configureGlobalShortcuts() {
         let globalShortcuts = GlobalShortcutService()
-        let settings = (try? container.mainContext.fetch(FetchDescriptor<AppSettings>()).first)
+        let settings = currentSettings()
         let definitions = settings.map(GlobalShortcutDefinition.definitions(from:)) ?? GlobalShortcutDefinition.defaults
 
         self.globalShortcuts?.unregisterAll()
@@ -102,5 +109,9 @@ public final class AppState {
         )
 
         self.globalShortcuts = globalShortcuts
+    }
+
+    private func currentSettings() -> AppSettings? {
+        try? container.mainContext.fetch(FetchDescriptor<AppSettings>()).first
     }
 }

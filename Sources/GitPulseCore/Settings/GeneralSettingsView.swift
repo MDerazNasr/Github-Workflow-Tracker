@@ -1,8 +1,8 @@
-import AppKit
 import SwiftData
 import SwiftUI
 
 struct GeneralSettingsView: View {
+    @Environment(AppState.self) private var appState
     @Query private var settingsArr: [AppSettings]
 
     private var settings: AppSettings {
@@ -22,8 +22,8 @@ struct GeneralSettingsView: View {
                 ) {
                     DarkToggle(isOn: $settings.showInDock)
                 }
-                    .onChange(of: settings.showInDock) { _, show in
-                        NSApp.setActivationPolicy(show ? .regular : .accessory)
+                    .onChange(of: settings.showInDock) { _, _ in
+                        appState.applyRuntimeSettings(settings)
                     }
             }
             SettingsHint(text: "Only settings connected to current app behavior are shown here.")

@@ -24,9 +24,9 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - Do not use SwiftUI `Form`, `.formStyle(.grouped)`, adaptive system colors, native toggles, or native pickers for app UI.
 - The activity popover is hosted inside an AppKit status-item `NSMenu` so macOS keeps the auto-hidden menu bar visible while it is open.
 - The full settings UI is a custom dark window with a custom sidebar and detail area.
-- Settings sections are General, Appearance, Account, Notifications, Repositories, Polling, Menu Bar, Shortcuts, Advanced.
-- Active settings controls are Dock visibility, app appearance, popover width, GitHub account connection, manual polling, custom shortcuts, local pull request cache clearing, settings reset, full data reset, and changelog opening.
-- Sections for notifications, repositories, and menu bar show status only until their backing services or customization hooks are implemented.
+- Settings sections are General, Account, Polling, Popover, Shortcuts, Advanced.
+- Active settings controls are Dock visibility, GitHub account connection, manual polling, popover width, custom shortcuts, local pull request cache clearing, settings reset, full data reset, and changelog opening.
+- Do not show placeholder sections for notifications, repositories, menu bar badges, or other future features until they control real behavior.
 
 ## File Boundaries
 
