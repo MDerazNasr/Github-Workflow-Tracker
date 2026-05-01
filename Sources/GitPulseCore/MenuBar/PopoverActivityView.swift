@@ -9,7 +9,7 @@ struct PopoverActivityView: View {
 
     var body: some View {
         content
-            .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 360)
+            .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 520)
     }
 
     @ViewBuilder

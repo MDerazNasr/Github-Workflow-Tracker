@@ -60,7 +60,15 @@ public final class StatusItemPopoverController {
                 .modelContainer(container)
                 .environment(appState)
         )
-        hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 640)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 0)
+        hostingView.layoutSubtreeIfNeeded()
+        let fittingSize = hostingView.fittingSize
+        hostingView.frame = NSRect(
+            x: 0,
+            y: 0,
+            width: 420,
+            height: min(max(fittingSize.height, 260), 640)
+        )
         hostingView.wantsLayer = true
         hostingView.layer?.backgroundColor = NSColor(
             calibratedRed: 0.067,
