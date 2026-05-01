@@ -3,9 +3,12 @@ import SwiftData
 import SwiftUI
 
 struct AdvancedSettingsView: View {
+    @Environment(\.modelContext) private var context
+    @Environment(AppState.self) private var appState
     @Query private var settingsArr: [AppSettings]
     @State private var showResetConfirmation = false
     @State private var showFullResetConfirmation = false
+    @State private var showClearPullRequestsConfirmation = false
 
     private var settings: AppSettings {
         settingsArr.first!
@@ -15,44 +18,12 @@ struct AdvancedSettingsView: View {
         @Bindable var settings = settings
 
         VStack(alignment: .leading, spacing: 0) {
-            SectionLabel(text: "logging", isFirst: true)
+            SectionLabel(text: "cache", isFirst: true)
             SettingsGroup {
-                SettingsRow(label: "Log level") {
-                    DarkPicker(
-                        options: LogLevel.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
-                        selection: $settings.logLevel
-                    )
-                }
-                SettingsRow(label: "Write logs to file", subtitle: "~/Library/Logs/GitPulse/gitpulse.log") {
-                    DarkToggle(isOn: $settings.writeLogsToFile)
-                }
-                SettingsRow(label: "Open log file", hasDivider: false) {
-                    StandardButton(title: "Open") {
-                        NSWorkspace.shared.open(logFileURL)
+                SettingsRow(label: "Stored pull requests", subtitle: "Clear the local cache and fetch again when needed", hasDivider: false) {
+                    DangerButton(title: "Clear") {
+                        showClearPullRequestsConfirmation = true
                     }
-                }
-            }
-
-            SectionLabel(text: "developer")
-            SettingsGroup {
-                SettingsRow(label: "Show API request log", subtitle: "Overlay showing every GitHub API call in real time") {
-                    DarkToggle(isOn: $settings.showAPIRequestLog)
-                }
-                SettingsRow(label: "Simulate slow network", subtitle: "Adds 2s latency to all API calls") {
-                    DarkToggle(isOn: $settings.simulateSlowNetwork)
-                }
-                SettingsRow(label: "Force CI failure state", subtitle: "Overrides all CI status to failing, tests icon color", hasDivider: false) {
-                    DarkToggle(isOn: $settings.forceCIFailureState)
-                }
-            }
-
-            SectionLabel(text: "cache")
-            SettingsGroup {
-                SettingsRow(label: "Cache size") {
-                    valueText("0 KB")
-                }
-                SettingsRow(label: "Clear cache", hasDivider: false) {
-                    DangerButton(title: "Clear") {}
                 }
             }
 
@@ -71,14 +42,8 @@ struct AdvancedSettingsView: View {
                 SettingsRow(label: "Version") {
                     valueText(appVersion)
                 }
-                SettingsRow(label: "Auto-update") {
-                    DarkToggle(isOn: $settings.autoUpdate)
-                }
-                SettingsRow(label: "Check for updates") {
-                    StandardButton(title: "Check now") {}
-                }
                 SettingsRow(label: "View changelog", hasDivider: false) {
-                    StandardButton(title: "Open ↗") {
+                    StandardButton(title: "Open") {
                         NSWorkspace.shared.open(changelogURL)
                     }
                 }
@@ -90,16 +55,18 @@ struct AdvancedSettingsView: View {
                 settings.resetToDefaults()
             }
         }
+        .confirmationDialog("Clear stored pull requests?", isPresented: $showClearPullRequestsConfirmation) {
+            Button("Clear Pull Requests", role: .destructive) {
+                clearPullRequests()
+            }
+        }
         .confirmationDialog("Delete all data and sign out?", isPresented: $showFullResetConfirmation) {
             Button("Delete Data", role: .destructive) {
                 settings.resetToDefaults()
+                clearPullRequests()
+                appState.gitHubAccount.signOut()
             }
         }
-    }
-
-    private var logFileURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
-            .appending(path: "Library/Logs/GitPulse/gitpulse.log")
     }
 
     private var appVersion: String {
@@ -108,6 +75,18 @@ struct AdvancedSettingsView: View {
 
     private var changelogURL: URL {
         URL(string: "https://github.com/")!
+    }
+
+    private func clearPullRequests() {
+        let descriptor = FetchDescriptor<AuthoredPullRequest>()
+        guard let pullRequests = try? context.fetch(descriptor) else {
+            return
+        }
+
+        for pullRequest in pullRequests {
+            context.delete(pullRequest)
+        }
+        try? context.save()
     }
 
     private func valueText(_ value: String) -> some View {
