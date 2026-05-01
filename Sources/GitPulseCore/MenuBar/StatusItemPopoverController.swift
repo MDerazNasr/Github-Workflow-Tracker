@@ -53,6 +53,7 @@ public final class StatusItemPopoverController {
     private func makeMenu(appState: AppState) -> NSMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
+        menu.appearance = NSAppearance(named: .darkAqua)
 
         let hostingView = NSHostingView(
             rootView: PopoverRootView()
@@ -60,6 +61,13 @@ public final class StatusItemPopoverController {
                 .environment(appState)
         )
         hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 640)
+        hostingView.wantsLayer = true
+        hostingView.layer?.backgroundColor = NSColor(
+            calibratedRed: 0.067,
+            green: 0.067,
+            blue: 0.075,
+            alpha: 1
+        ).cgColor
 
         let item = NSMenuItem()
         item.view = hostingView
