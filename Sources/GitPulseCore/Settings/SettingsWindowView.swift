@@ -3,12 +3,9 @@ import SwiftUI
 
 enum SettingsSection: String, CaseIterable, Identifiable {
     case general
-    case appearance
     case account
-    case notifications
-    case repositories
     case polling
-    case menuBar
+    case popover
     case shortcuts
     case advanced
 
@@ -17,12 +14,9 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .general: return "General"
-        case .appearance: return "Appearance"
         case .account: return "Account"
-        case .notifications: return "Notifications"
-        case .repositories: return "Repositories"
         case .polling: return "Polling"
-        case .menuBar: return "Menu Bar"
+        case .popover: return "Popover"
         case .shortcuts: return "Shortcuts"
         case .advanced: return "Advanced"
         }
@@ -31,12 +25,9 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .general: return "gearshape"
-        case .appearance: return "paintbrush"
         case .account: return "person.crop.circle"
-        case .notifications: return "bell"
-        case .repositories: return "folder"
         case .polling: return "arrow.clockwise"
-        case .menuBar: return "menubar.rectangle"
+        case .popover: return "rectangle.bottomthird.inset.filled"
         case .shortcuts: return "keyboard"
         case .advanced: return "wrench.and.screwdriver"
         }
@@ -70,12 +61,9 @@ public struct SettingsWindowView: View {
     private var detailView: some View {
         switch selection ?? .general {
         case .general: GeneralSettingsView()
-        case .appearance: AppearanceSettingsView()
         case .account: AccountSettingsView()
-        case .notifications: NotificationsSettingsView()
-        case .repositories: RepositoriesSettingsView()
         case .polling: PollingSettingsView()
-        case .menuBar: MenuBarSettingsView()
+        case .popover: PopoverSettingsView()
         case .shortcuts: ShortcutsSettingsView()
         case .advanced: AdvancedSettingsView()
         }
@@ -162,12 +150,9 @@ private extension SettingsSection {
     var iconBackground: Color {
         switch self {
         case .general: return Color(hex: 0xe3f0ff)
-        case .appearance: return Color(hex: 0xf0e6ff)
         case .account: return Color(hex: 0xe6f5e6)
-        case .notifications: return Color(hex: 0xfff3e0)
-        case .repositories: return Color(hex: 0xfce8e8)
         case .polling: return Color(hex: 0xe6f0ff)
-        case .menuBar: return Color(hex: 0xe8f5e9)
+        case .popover: return Color(hex: 0xf0e6ff)
         case .shortcuts: return Color(hex: 0xf5f0e0)
         case .advanced: return Color(hex: 0xf0f0f0)
         }
@@ -176,10 +161,9 @@ private extension SettingsSection {
     var iconColor: Color {
         switch self {
         case .general, .polling: return GitPulseColors.blueBase
-        case .appearance: return Color(hex: 0x9b59b6)
-        case .account, .menuBar: return GitPulseColors.green
-        case .notifications, .shortcuts: return GitPulseColors.amber
-        case .repositories: return GitPulseColors.red
+        case .popover: return Color(hex: 0x9b59b6)
+        case .account: return GitPulseColors.green
+        case .shortcuts: return GitPulseColors.amber
         case .advanced: return Color.white.opacity(0.31)
         }
     }

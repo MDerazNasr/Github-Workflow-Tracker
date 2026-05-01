@@ -1,8 +1,7 @@
-import AppKit
 import SwiftData
 import SwiftUI
 
-struct AppearanceSettingsView: View {
+struct PopoverSettingsView: View {
     @Query private var settingsArr: [AppSettings]
 
     private var settings: AppSettings {
@@ -13,20 +12,7 @@ struct AppearanceSettingsView: View {
         @Bindable var settings = settings
 
         VStack(alignment: .leading, spacing: 0) {
-            SectionLabel(text: "theme", isFirst: true)
-            SettingsGroup {
-                SettingsRow(label: "Appearance", hasDivider: false) {
-                    DarkPicker(
-                        options: AppAppearance.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
-                        selection: $settings.appearanceMode
-                    )
-                }
-                .onChange(of: settings.appearanceMode) { _, mode in
-                    applyAppearance(mode)
-                }
-            }
-
-            SectionLabel(text: "popover")
+            SectionLabel(text: "popover", isFirst: true)
             SettingsGroup {
                 SettingsRow(label: "Popover width", hasDivider: false) {
                     HStack(spacing: 8) {
@@ -35,7 +21,7 @@ struct AppearanceSettingsView: View {
                                 get: { Double(settings.popoverWidth) },
                                 set: { settings.popoverWidth = Int($0) }
                             ),
-                            in: 300...480,
+                            in: 420...560,
                             step: 10
                         )
                         .frame(width: 100)
@@ -50,16 +36,5 @@ struct AppearanceSettingsView: View {
             SettingsHint(text: "Width changes apply the next time the menu bar popover opens.")
         }
         .padding(.vertical, 20)
-    }
-
-    private func applyAppearance(_ mode: String) {
-        switch AppAppearance(rawValue: mode) {
-        case .light:
-            NSApp.appearance = NSAppearance(named: .aqua)
-        case .dark:
-            NSApp.appearance = NSAppearance(named: .darkAqua)
-        default:
-            NSApp.appearance = nil
-        }
     }
 }

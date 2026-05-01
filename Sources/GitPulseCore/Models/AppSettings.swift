@@ -38,7 +38,7 @@ final class AppSettings {
     var denseLayout: Bool = false
 
     // MARK: Appearance — popover
-    var popoverWidth: Int = 360
+    var popoverWidth: Int = 420
     /// 10 | 20 | 30 | 0 (unlimited)
     var maxVisibleItems: Int = 20
     var showRelativeTimestamps: Bool = true
@@ -192,7 +192,7 @@ final class AppSettings {
         fontName = "sf-mono"
         fontSize = 13
         denseLayout = false
-        popoverWidth = 360
+        popoverWidth = 420
         maxVisibleItems = 20
         showRelativeTimestamps = true
         showAuthorAvatars = true
