@@ -15,7 +15,7 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - `AppSettings` is a single-row SwiftData model keyed by the unique id `singleton`.
 - `AppSettings.ensureExists(in:)` must run during app startup before views query settings.
 - Settings views bind directly to SwiftData models through `@Bindable`.
-- Notification matrix rows bind to `NotificationPrefs`, not `AppSettings`.
+- Settings panels must only expose controls connected to current app behavior. Future preferences can stay in the model only when hidden from the UI until their services exist.
 
 ## UI Contract
 
@@ -25,6 +25,8 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - The activity popover is hosted inside an AppKit status-item `NSMenu` so macOS keeps the auto-hidden menu bar visible while it is open.
 - The full settings UI is a custom dark window with a custom sidebar and detail area.
 - Settings sections are General, Appearance, Account, Notifications, Repositories, Polling, Menu Bar, Shortcuts, Advanced.
+- Active settings controls are Dock visibility, app appearance, popover width, GitHub account connection, manual polling, custom shortcuts, local pull request cache clearing, settings reset, full data reset, and changelog opening.
+- Sections for notifications, repositories, and menu bar show status only until their backing services or customization hooks are implemented.
 
 ## File Boundaries
 
@@ -39,4 +41,4 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - Authored open pull requests are fetched from GitHub GraphQL and stored in SwiftData for the menu popover.
 - Default global shortcuts are registered with native macOS hotkey APIs while GitPulse is running.
 - Global shortcut mappings can be recorded in the Shortcuts settings panel and are persisted in `AppSettings`.
-- Webhooks, Sparkle updates, and notifications delivery still need concrete service implementations.
+- Webhooks, Sparkle updates, menu bar badge customization, organization watching, repository filters, and notifications delivery still need concrete service implementations.
