@@ -6,7 +6,7 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 
 - Swift 6 package with a small executable target, `GitPulseApp`.
 - Reusable app code lives in the `GitPulseCore` library target.
-- UI uses SwiftUI hosted inside AppKit `NSStatusItem` / `NSPopover`, with a custom dark settings `NSWindow`.
+- UI uses SwiftUI hosted inside AppKit `NSStatusItem` anchored panels, with a custom dark settings `NSWindow`.
 - Persistence uses SwiftData models with a shared `ModelContainer`.
 - Tests use Swift Testing and in-memory SwiftData containers.
 
@@ -22,7 +22,7 @@ GitPulse is a macOS SwiftUI menu bar app for tracking GitHub workflow activity. 
 - `GitPulse UI Spec - Claude.docx` supersedes prior native macOS UI guidance.
 - Popover and settings use a hardcoded dark terminal palette and monospaced typography.
 - Do not use SwiftUI `Form`, `.formStyle(.grouped)`, adaptive system colors, native toggles, or native pickers for app UI.
-- The activity popover is anchored to an AppKit `NSStatusItem` so it behaves correctly with auto-hidden macOS menu bars.
+- The activity popover is a non-activating panel positioned under the AppKit `NSStatusItem` so it behaves correctly with auto-hidden macOS menu bars.
 - The full settings UI is a custom dark window with a custom sidebar and detail area.
 - Settings sections are General, Appearance, Account, Notifications, Repositories, Polling, Menu Bar, Shortcuts, Advanced.
 
