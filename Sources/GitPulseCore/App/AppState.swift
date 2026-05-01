@@ -69,11 +69,22 @@ public final class AppState {
         settingsWindowController?.show()
     }
 
+    public func reloadGlobalShortcuts() {
+        guard globalShortcuts != nil else {
+            return
+        }
+        configureGlobalShortcuts()
+    }
+
     private func configureGlobalShortcuts() {
         let quickPopover = QuickPopoverWindowController(appState: self, container: container)
         let globalShortcuts = GlobalShortcutService()
+        let settings = (try? container.mainContext.fetch(FetchDescriptor<AppSettings>()).first)
+        let definitions = settings.map(GlobalShortcutDefinition.definitions(from:)) ?? GlobalShortcutDefinition.defaults
 
-        globalShortcuts.registerDefaults(
+        self.globalShortcuts?.unregisterAll()
+        globalShortcuts.register(
+            definitions: definitions,
             openPopover: { [weak self] in
                 self?.quickPopover?.toggle()
             },

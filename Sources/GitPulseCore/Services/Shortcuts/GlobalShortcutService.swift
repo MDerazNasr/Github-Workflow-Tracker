@@ -6,10 +6,12 @@ public final class GlobalShortcutService {
     private var hotKeyRefs: [EventHotKeyRef] = []
     private var eventHandlerRef: EventHandlerRef?
     private var actions: [GlobalShortcutAction: @MainActor () -> Void] = [:]
+    public private(set) var failedDefinitions: [GlobalShortcutDefinition] = []
 
     public init() {}
 
-    public func registerDefaults(
+    public func register(
+        definitions: [GlobalShortcutDefinition],
         openPopover: @escaping @MainActor () -> Void,
         refresh: @escaping @MainActor () -> Void,
         markAllRead: @escaping @MainActor () -> Void,
@@ -23,7 +25,7 @@ public final class GlobalShortcutService {
         ]
         installHandlerIfNeeded()
 
-        for definition in GlobalShortcutDefinition.defaults {
+        for definition in definitions {
             register(definition)
         }
     }
@@ -53,6 +55,7 @@ public final class GlobalShortcutService {
             UnregisterEventHotKey(ref)
         }
         hotKeyRefs.removeAll()
+        failedDefinitions.removeAll()
 
         if let eventHandlerRef {
             RemoveEventHandler(eventHandlerRef)
@@ -78,6 +81,8 @@ public final class GlobalShortcutService {
 
         if status == noErr, let hotKeyRef {
             hotKeyRefs.append(hotKeyRef)
+        } else {
+            failedDefinitions.append(definition)
         }
     }
 
