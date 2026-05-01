@@ -22,4 +22,37 @@ struct GlobalShortcutDefinitionTests {
         #expect(displays[.markAllRead] == "⌥ M")
         #expect(displays[.openSettings] == "⌥ ,")
     }
+
+    @Test("parser accepts custom shortcut strings")
+    func parserAcceptsCustomShortcuts() {
+        let definition = GlobalShortcutDefinition.parse(
+            action: .refresh,
+            displayString: "⌃ ⌥ P"
+        )
+
+        #expect(definition?.action == .refresh)
+        #expect(definition?.displayString == "⌃ ⌥ P")
+        #expect(definition?.keyCode == 35)
+    }
+
+    @Test("parser rejects shortcuts without modifiers")
+    func parserRejectsMissingModifiers() {
+        let definition = GlobalShortcutDefinition.parse(
+            action: .refresh,
+            displayString: "P"
+        )
+
+        #expect(definition == nil)
+    }
+
+    @Test("settings definitions fall back per invalid shortcut")
+    func settingsDefinitionsFallBackForInvalidValues() {
+        let settings = AppSettings()
+        settings.shortcutRefresh = "not a shortcut"
+
+        let definitions = GlobalShortcutDefinition.definitions(from: settings)
+        let refresh = definitions.first { $0.action == .refresh }
+
+        #expect(refresh?.displayString == "⌥ R")
+    }
 }
