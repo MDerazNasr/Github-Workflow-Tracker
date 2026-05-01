@@ -37,12 +37,6 @@ struct PullRequestRow: View {
                 .padding(.leading, 28)
                 .padding(.trailing, 14)
 
-                if pullRequest.checkStatus == .failing {
-                    Circle()
-                        .fill(GitPulseColors.red)
-                        .frame(width: 6, height: 6)
-                        .offset(x: 18, y: 9)
-                }
             }
             .background(isHovered ? GitPulseColors.rowHover : Color.clear)
             .contentShape(Rectangle())
@@ -53,10 +47,10 @@ struct PullRequestRow: View {
 
     private var statusColor: Color {
         switch pullRequest.checkStatus {
-        case .passing: return .green
-        case .failing: return .red
-        case .pending, .expected: return .orange
-        case .unknown: return .secondary
+        case .passing: return GitPulseColors.green
+        case .failing: return GitPulseColors.red
+        case .pending, .expected: return GitPulseColors.amber
+        case .unknown: return GitPulseColors.textFaint
         }
     }
 

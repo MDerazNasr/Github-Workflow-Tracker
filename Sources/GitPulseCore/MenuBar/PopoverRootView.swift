@@ -59,7 +59,7 @@ public struct PopoverRootView: View {
             )
         }
         .background(GitPulseColors.background)
-        .frame(width: CGFloat(settings?.popoverWidth ?? 360))
+        .frame(width: CGFloat(max(settings?.popoverWidth ?? 420, 420)))
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 10, bottomTrailingRadius: 10))
         .overlay(
             UnevenRoundedRectangle(bottomLeadingRadius: 10, bottomTrailingRadius: 10)

@@ -59,7 +59,7 @@ public final class StatusItemPopoverController {
                 .modelContainer(container)
                 .environment(appState)
         )
-        hostingView.frame = NSRect(x: 0, y: 0, width: 360, height: 580)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 640)
 
         let item = NSMenuItem()
         item.view = hostingView
