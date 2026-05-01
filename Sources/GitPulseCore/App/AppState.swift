@@ -10,7 +10,7 @@ public final class AppState {
     public let gitHubAccount: GitHubAccountService
     public let pullRequestSync: PullRequestSyncService
     public private(set) var globalShortcuts: GlobalShortcutService?
-    public private(set) var quickPopover: QuickPopoverWindowController?
+    public private(set) var statusItemPopover: StatusItemPopoverController?
     private var settingsWindowController: SettingsWindowController?
     public var lastPollDate: Date?
     public var lastMarkedAllReadDate: Date?
@@ -42,6 +42,7 @@ public final class AppState {
         lastMarkedAllReadDate = nil
         rateLimitSummary = "Not checked"
 
+        statusItemPopover = StatusItemPopoverController(appState: self, container: container)
         if enableGlobalShortcuts {
             configureGlobalShortcuts()
         }
@@ -77,7 +78,6 @@ public final class AppState {
     }
 
     private func configureGlobalShortcuts() {
-        let quickPopover = QuickPopoverWindowController(appState: self, container: container)
         let globalShortcuts = GlobalShortcutService()
         let settings = (try? container.mainContext.fetch(FetchDescriptor<AppSettings>()).first)
         let definitions = settings.map(GlobalShortcutDefinition.definitions(from:)) ?? GlobalShortcutDefinition.defaults
@@ -86,7 +86,7 @@ public final class AppState {
         globalShortcuts.register(
             definitions: definitions,
             openPopover: { [weak self] in
-                self?.quickPopover?.toggle()
+                self?.statusItemPopover?.toggle()
             },
             refresh: { [weak self] in
                 Task {
@@ -101,7 +101,6 @@ public final class AppState {
             }
         )
 
-        self.quickPopover = quickPopover
         self.globalShortcuts = globalShortcuts
     }
 }
