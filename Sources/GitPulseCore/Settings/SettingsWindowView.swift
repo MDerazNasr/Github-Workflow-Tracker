@@ -85,14 +85,6 @@ public struct SettingsWindowView: View {
 private struct SettingsTitleBar: View {
     var body: some View {
         ZStack {
-            HStack(spacing: 8) {
-                Circle().fill(Color(hex: 0xff5f57)).frame(width: 12, height: 12)
-                Circle().fill(Color(hex: 0xffbd2e)).frame(width: 12, height: 12)
-                Circle().fill(Color(hex: 0x28c840)).frame(width: 12, height: 12)
-                Spacer()
-            }
-            .padding(.horizontal, 14)
-
             Text("GitPulse Settings")
                 .font(GitPulseText.mono(13))
                 .foregroundColor(GitPulseColors.textPrimary)
