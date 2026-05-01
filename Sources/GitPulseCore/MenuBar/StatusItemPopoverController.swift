@@ -54,19 +54,20 @@ public final class StatusItemPopoverController {
         let menu = NSMenu()
         menu.autoenablesItems = false
         menu.appearance = NSAppearance(named: .darkAqua)
+        let width = configuredPopoverWidth()
 
         let hostingView = NSHostingView(
             rootView: PopoverRootView()
                 .modelContainer(container)
                 .environment(appState)
         )
-        hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 0)
+        hostingView.frame = NSRect(x: 0, y: 0, width: width, height: 0)
         hostingView.layoutSubtreeIfNeeded()
         let fittingSize = hostingView.fittingSize
         hostingView.frame = NSRect(
             x: 0,
             y: 0,
-            width: 420,
+            width: width,
             height: min(max(fittingSize.height, 260), 640)
         )
         hostingView.wantsLayer = true
@@ -81,6 +82,12 @@ public final class StatusItemPopoverController {
         item.view = hostingView
         menu.addItem(item)
         return menu
+    }
+
+    private func configuredPopoverWidth() -> CGFloat {
+        let descriptor = FetchDescriptor<AppSettings>()
+        let width = (try? container.mainContext.fetch(descriptor).first?.popoverWidth) ?? 420
+        return CGFloat(max(width, 420))
     }
 
     @objc private func toggleFromStatusItem() {
