@@ -31,11 +31,11 @@ struct DarkPicker<Value: Hashable>: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .frame(minWidth: 120)
-            .background(GitPulseColors.controlBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
-            )
+                .background(GitPulseColors.controlBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                    .stroke(GitPulseColors.controlStroke, lineWidth: 0.5)
+                )
         }
         .buttonStyle(.plain)
     }
@@ -53,7 +53,7 @@ struct SettingsTextInput: View {
             .foregroundColor(GitPulseColors.textRow)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color.white.opacity(0.04))
+            .background(GitPulseColors.subtleFill)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
                     .stroke(focused ? GitPulseColors.hoverBorder : GitPulseColors.border, lineWidth: 0.5)
@@ -74,7 +74,7 @@ struct SettingsSecureInput: View {
             .foregroundColor(GitPulseColors.textRow)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color.white.opacity(0.04))
+            .background(GitPulseColors.subtleFill)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
                     .stroke(focused ? GitPulseColors.hoverBorder : GitPulseColors.border, lineWidth: 0.5)

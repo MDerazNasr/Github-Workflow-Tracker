@@ -46,7 +46,7 @@ public struct PopoverRootView: View {
             .padding(.vertical, 8)
             .overlay(alignment: .bottom) {
                 Rectangle()
-                    .fill(Color.white.opacity(0.06))
+                    .fill(GitPulseColors.controlStroke)
                     .frame(height: 0.5)
             }
 
@@ -66,6 +66,7 @@ public struct PopoverRootView: View {
             UnevenRoundedRectangle(bottomLeadingRadius: 10, bottomTrailingRadius: 10)
                 .stroke(GitPulseColors.border, lineWidth: 0.5)
         )
+        .preferredColorScheme(settings?.appearance.colorScheme)
     }
 
     private var appVersion: String {

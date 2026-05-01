@@ -13,7 +13,7 @@ enum BadgeTone {
         case .amber: return GitPulseColors.amber
         case .green: return GitPulseColors.green
         case .blue: return GitPulseColors.blue
-        case .gray: return Color.white.opacity(0.31)
+        case .gray: return GitPulseColors.mutedBadgeText
         }
     }
 
@@ -23,7 +23,7 @@ enum BadgeTone {
         case .amber: return GitPulseColors.amberFill
         case .green: return GitPulseColors.greenFill
         case .blue: return GitPulseColors.blueFill
-        case .gray: return Color.white.opacity(0.07)
+        case .gray: return GitPulseColors.mutedBadgeFill
         }
     }
 
@@ -33,7 +33,7 @@ enum BadgeTone {
         case .amber: return GitPulseColors.amberBorder
         case .green: return GitPulseColors.greenBorder
         case .blue: return GitPulseColors.blueBorder
-        case .gray: return Color.white.opacity(0.12)
+        case .gray: return GitPulseColors.controlStroke
         }
     }
 }

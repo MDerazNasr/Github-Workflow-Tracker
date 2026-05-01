@@ -15,6 +15,15 @@ struct GeneralSettingsView: View {
         VStack(alignment: .leading, spacing: 0) {
             SectionLabel(text: "app", isFirst: true)
             SettingsGroup {
+                SettingsRow(label: "Appearance") {
+                    DarkPicker(
+                        options: AppAppearance.allCases.map { SelectOption(id: $0.rawValue, label: $0.displayName) },
+                        selection: $settings.appearanceMode
+                    )
+                }
+                .onChange(of: settings.appearanceMode) { _, _ in
+                    appState.applyRuntimeSettings(settings)
+                }
                 SettingsRow(
                     label: "Show in Dock",
                     subtitle: "Show or hide GitPulse in the macOS Dock",

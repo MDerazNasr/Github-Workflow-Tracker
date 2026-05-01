@@ -36,6 +36,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
 
 public struct SettingsWindowView: View {
     @State private var selection: SettingsSection? = .general
+    @Query private var settingsArr: [AppSettings]
 
     public init() {}
 
@@ -55,6 +56,7 @@ public struct SettingsWindowView: View {
         }
         .frame(minWidth: 700, minHeight: 520)
         .background(GitPulseColors.background)
+        .preferredColorScheme(settingsArr.first?.appearance.colorScheme)
     }
 
     @ViewBuilder
@@ -164,7 +166,7 @@ private extension SettingsSection {
         case .popover: return Color(hex: 0x9b59b6)
         case .account: return GitPulseColors.green
         case .shortcuts: return GitPulseColors.amber
-        case .advanced: return Color.white.opacity(0.31)
+        case .advanced: return GitPulseColors.mutedBadgeText
         }
     }
 }

@@ -15,6 +15,7 @@ final class SettingsWindowController {
 
     func show() {
         if let window {
+            applyAppearance(currentAppearance())
             NSApp.activate(ignoringOtherApps: true)
             window.makeKeyAndOrderFront(nil)
             return
@@ -35,8 +36,7 @@ final class SettingsWindowController {
         window.titlebarAppearsTransparent = true
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 700, height: 520)
-        window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(calibratedRed: 0.067, green: 0.067, blue: 0.075, alpha: 1)
+        applyAppearance(currentAppearance(), to: window)
         window.contentViewController = NSHostingController(
             rootView: SettingsWindowView()
                 .modelContainer(container)
@@ -46,5 +46,22 @@ final class SettingsWindowController {
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
         self.window = window
+    }
+
+    func applyAppearance(_ appearance: AppAppearance) {
+        guard let window else {
+            return
+        }
+        applyAppearance(appearance, to: window)
+    }
+
+    private func applyAppearance(_ appearance: AppAppearance, to window: NSWindow) {
+        window.appearance = appearance.nsAppearance
+        window.backgroundColor = GitPulseColors.backgroundNSColor(for: appearance)
+    }
+
+    private func currentAppearance() -> AppAppearance {
+        let descriptor = FetchDescriptor<AppSettings>()
+        return (try? container.mainContext.fetch(descriptor).first?.appearance) ?? .system
     }
 }

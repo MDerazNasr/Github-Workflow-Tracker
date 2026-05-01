@@ -82,6 +82,8 @@ public final class AppState {
 
     func applyRuntimeSettings(_ settings: AppSettings) {
         NSApp.setActivationPolicy(settings.showInDock ? .regular : .accessory)
+        NSApp.appearance = settings.appearance.nsAppearance
+        settingsWindowController?.applyAppearance(settings.appearance)
     }
 
     private func configureGlobalShortcuts() {

@@ -61,11 +61,11 @@ struct DarkToggle: View {
             isOn.toggle()
         } label: {
             Capsule()
-                .fill(isOn ? GitPulseColors.green.opacity(0.53) : Color.white.opacity(0.09))
+                .fill(isOn ? GitPulseColors.green.opacity(0.53) : GitPulseColors.controlInactiveFill)
                 .frame(width: 30, height: 17)
                 .overlay(
                     Circle()
-                        .fill(isOn ? GitPulseColors.green : Color.white.opacity(0.56))
+                        .fill(isOn ? GitPulseColors.green : GitPulseColors.controlInactiveKnob)
                         .frame(width: 12, height: 12)
                         .offset(x: isOn ? 6.5 : -6.5)
                         .animation(.spring(duration: 0.2), value: isOn)
@@ -83,11 +83,11 @@ struct MiniToggle: View {
             isOn.toggle()
         } label: {
             Capsule()
-                .fill(isOn ? GitPulseColors.blueBase.opacity(0.33) : Color.white.opacity(0.09))
+                .fill(isOn ? GitPulseColors.blueBase.opacity(0.33) : GitPulseColors.controlInactiveFill)
                 .frame(width: 22, height: 13)
                 .overlay(
                     Circle()
-                        .fill(isOn ? GitPulseColors.blue : Color.white.opacity(0.56))
+                        .fill(isOn ? GitPulseColors.blue : GitPulseColors.controlInactiveKnob)
                         .frame(width: 9, height: 9)
                         .offset(x: isOn ? 4.5 : -4.5)
                         .animation(.spring(duration: 0.2), value: isOn)
@@ -111,7 +111,7 @@ struct StandardButton: View {
                 .background(GitPulseColors.controlBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
+                        .stroke(GitPulseColors.controlStroke, lineWidth: 0.5)
                 )
         }
         .buttonStyle(.plain)
@@ -145,13 +145,13 @@ struct KbdBadge: View {
     var body: some View {
         Text(shortcut)
             .font(GitPulseText.mono(11))
-            .foregroundColor(Color.white.opacity(0.31))
+            .foregroundColor(GitPulseColors.mutedBadgeText)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(GitPulseColors.controlBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
+                    .stroke(GitPulseColors.controlStroke, lineWidth: 0.5)
             )
     }
 }

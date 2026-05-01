@@ -53,13 +53,15 @@ public final class StatusItemPopoverController {
     private func makeMenu(appState: AppState) -> NSMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
-        menu.appearance = NSAppearance(named: .darkAqua)
+        let appearance = configuredAppearance()
+        menu.appearance = appearance.nsAppearance
         let width = configuredPopoverWidth()
 
         let hostingView = NSHostingView(
             rootView: PopoverRootView()
                 .modelContainer(container)
                 .environment(appState)
+                .preferredColorScheme(appearance.colorScheme)
         )
         hostingView.frame = NSRect(x: 0, y: 0, width: width, height: 0)
         hostingView.layoutSubtreeIfNeeded()
@@ -71,12 +73,7 @@ public final class StatusItemPopoverController {
             height: min(max(fittingSize.height, 260), 640)
         )
         hostingView.wantsLayer = true
-        hostingView.layer?.backgroundColor = NSColor(
-            calibratedRed: 0.067,
-            green: 0.067,
-            blue: 0.075,
-            alpha: 1
-        ).cgColor
+        hostingView.layer?.backgroundColor = GitPulseColors.backgroundNSColor(for: appearance).cgColor
 
         let item = NSMenuItem()
         item.view = hostingView
@@ -88,6 +85,11 @@ public final class StatusItemPopoverController {
         let descriptor = FetchDescriptor<AppSettings>()
         let width = (try? container.mainContext.fetch(descriptor).first?.popoverWidth) ?? 420
         return CGFloat(max(width, 420))
+    }
+
+    private func configuredAppearance() -> AppAppearance {
+        let descriptor = FetchDescriptor<AppSettings>()
+        return (try? container.mainContext.fetch(descriptor).first?.appearance) ?? .system
     }
 
     @objc private func toggleFromStatusItem() {

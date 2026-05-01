@@ -8,7 +8,7 @@ struct PopoverFooter: View {
     var body: some View {
         VStack(spacing: 0) {
             Rectangle()
-                .fill(Color.white.opacity(0.07))
+                .fill(GitPulseColors.controlStroke)
                 .frame(height: 0.5)
 
             HStack {

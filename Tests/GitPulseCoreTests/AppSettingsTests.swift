@@ -48,6 +48,7 @@ struct AppSettingsTests {
         settings.webhookEnabled = true
         settings.menuBarCountCap = 0
         settings.popoverWidth = 560
+        settings.appearanceMode = "dark"
 
         settings.resetToDefaults()
 
@@ -57,6 +58,7 @@ struct AppSettingsTests {
         #expect(!settings.webhookEnabled)
         #expect(settings.menuBarCountCap == 99)
         #expect(settings.popoverWidth == 420)
+        #expect(settings.appearanceMode == "system")
     }
 
     private func makeContainer() throws -> ModelContainer {

@@ -27,7 +27,7 @@ struct PopoverHeader: View {
             .padding(.vertical, 10)
 
             Rectangle()
-                .fill(Color.white.opacity(0.07))
+                .fill(GitPulseColors.controlStroke)
                 .frame(height: 0.5)
         }
     }
