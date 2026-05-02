@@ -28,6 +28,18 @@ struct NotificationsSettingsView: View {
                 }
             }
             SettingsHint(text: "These controls show or hide activity types in the menu bar popover.")
+
+            SectionLabel(text: "testing")
+            SettingsGroup {
+                SettingsRow(
+                    label: "Demo activity",
+                    subtitle: "Show sample PR, issue, CI/CD, and mention events",
+                    hasDivider: false
+                ) {
+                    DarkToggle(isOn: $settings.demoMode)
+                }
+            }
+            SettingsHint(text: "Demo activity lets you verify filters and row states without real GitHub notifications.")
         }
         .padding(.vertical, 20)
     }

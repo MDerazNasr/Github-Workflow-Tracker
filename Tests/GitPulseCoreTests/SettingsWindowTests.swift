@@ -27,4 +27,11 @@ struct SettingsWindowTests {
         #expect(!FeedFilter.cicd.isEnabled(in: settings))
         #expect(FeedFilter.mentions.isEnabled(in: settings))
     }
+
+    @Test("demo activity covers supported activity filters")
+    func demoActivityCoversSupportedActivityFilters() {
+        let filters = Set(DemoWorkflowEvent.samples().map(\.filter))
+
+        #expect(filters == Set([.prs, .issues, .cicd, .mentions]))
+    }
 }

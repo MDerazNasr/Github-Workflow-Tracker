@@ -49,6 +49,7 @@ struct AppSettingsTests {
         settings.menuBarCountCap = 0
         settings.popoverWidth = 560
         settings.appearanceMode = "dark"
+        settings.demoMode = true
 
         settings.resetToDefaults()
 
@@ -59,6 +60,7 @@ struct AppSettingsTests {
         #expect(settings.menuBarCountCap == 99)
         #expect(settings.popoverWidth == 420)
         #expect(settings.appearanceMode == "system")
+        #expect(!settings.demoMode)
     }
 
     private func makeContainer() throws -> ModelContainer {

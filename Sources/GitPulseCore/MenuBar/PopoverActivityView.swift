@@ -22,7 +22,7 @@ struct PopoverActivityView: View {
         if appState.pullRequestSync.isRefreshing {
             ProgressView("Refreshing PRs")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if visiblePullRequests.isEmpty {
+        } else if visiblePullRequests.isEmpty && visibleDemoEvents.isEmpty {
             emptyState
         } else {
             ScrollView {
@@ -31,6 +31,12 @@ struct PopoverActivityView: View {
                         RepoPullRequestSection(
                             repositoryName: group.repository,
                             pullRequests: group.pullRequests
+                        )
+                    }
+                    ForEach(groupedDemoEvents, id: \.repository) { group in
+                        DemoWorkflowEventSection(
+                            repositoryName: group.repository,
+                            events: group.events
                         )
                     }
                 }
@@ -64,10 +70,13 @@ struct PopoverActivityView: View {
         if let error = appState.pullRequestSync.lastErrorMessage {
             return error
         }
+        if settings?.demoMode == true {
+            return "no visible demo events"
+        }
         if appState.gitHubAccount.status.isConnected {
             return activeFilter == .prs || activeFilter == .all ? "no unread events" : "no \(activeFilter.label) events"
         }
-        return "Connect your account in Settings to show your open pull requests."
+        return "Connect GitHub or turn on demo activity in Settings."
     }
 
     private var visiblePullRequests: [AuthoredPullRequest] {
@@ -91,5 +100,50 @@ struct PopoverActivityView: View {
         return grouped
             .map { (repository: $0.key, pullRequests: $0.value.sorted { $0.updatedAt > $1.updatedAt }) }
             .sorted { $0.repository < $1.repository }
+    }
+
+    private var visibleDemoEvents: [DemoWorkflowEvent] {
+        guard settings?.demoMode == true else {
+            return []
+        }
+        return DemoWorkflowEvent.samples().filter { event in
+            switch activeFilter {
+            case .all:
+                return event.filter.isEnabled(in: settings)
+            default:
+                return event.filter == activeFilter && activeFilter.isEnabled(in: settings)
+            }
+        }
+    }
+
+    private var groupedDemoEvents: [(repository: String, events: [DemoWorkflowEvent])] {
+        let grouped = Dictionary(grouping: visibleDemoEvents, by: \.repositoryName)
+        return grouped
+            .map { (repository: $0.key, events: $0.value.sorted { $0.updatedAt > $1.updatedAt }) }
+            .sorted { $0.repository < $1.repository }
+    }
+}
+
+private struct DemoWorkflowEventSection: View {
+    let repositoryName: String
+    let events: [DemoWorkflowEvent]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                Text(repositoryName)
+                    .font(GitPulseText.mono(10, weight: .medium))
+                    .foregroundColor(GitPulseColors.textSecondary)
+                CountBadge(text: "demo", tone: .gray)
+                Spacer()
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 10)
+            .padding(.bottom, 4)
+
+            ForEach(events) { event in
+                DemoWorkflowEventRow(event: event)
+            }
+        }
     }
 }
