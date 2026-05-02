@@ -6,6 +6,11 @@ struct PopoverActivityView: View {
     let activeFilter: FeedFilter
     @Query(sort: \AuthoredPullRequest.updatedAt, order: .reverse)
     private var pullRequests: [AuthoredPullRequest]
+    @Query private var settingsArr: [AppSettings]
+
+    private var settings: AppSettings? {
+        settingsArr.first
+    }
 
     var body: some View {
         content
@@ -66,8 +71,15 @@ struct PopoverActivityView: View {
     }
 
     private var visiblePullRequests: [AuthoredPullRequest] {
+        guard activeFilter.isEnabled(in: settings) else {
+            return []
+        }
+
         switch activeFilter {
         case .all, .prs:
+            guard settings?.tabPRsEnabled ?? true else {
+                return []
+            }
             return pullRequests
         case .issues, .cicd, .mentions:
             return []

@@ -8,10 +8,23 @@ struct SettingsWindowTests {
         #expect(SettingsSection.allCases.map(\.label) == [
             "General",
             "Account",
+            "Notifications",
             "Polling",
             "Popover",
             "Shortcuts",
             "Advanced"
         ])
+    }
+
+    @Test("feed filters follow visible activity settings")
+    func feedFiltersFollowVisibleActivitySettings() {
+        let settings = AppSettings()
+        settings.tabIssuesEnabled = true
+        settings.tabCICDEnabled = false
+        settings.tabMentionsEnabled = true
+
+        #expect(FeedFilter.visibleFilters(settings: settings) == [.all, .prs, .issues, .mentions])
+        #expect(!FeedFilter.cicd.isEnabled(in: settings))
+        #expect(FeedFilter.mentions.isEnabled(in: settings))
     }
 }

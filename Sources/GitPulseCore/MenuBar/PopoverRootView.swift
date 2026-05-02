@@ -22,7 +22,9 @@ public struct PopoverRootView: View {
     }
 
     private func content(settings: AppSettings?) -> some View {
-        VStack(spacing: 0) {
+        let visibleFilters = FeedFilter.visibleFilters(settings: settings)
+
+        return VStack(spacing: 0) {
             PopoverHeader(
                 isRefreshing: appState.pullRequestSync.isRefreshing,
                 markAllRead: {
@@ -36,7 +38,7 @@ public struct PopoverRootView: View {
             )
 
             HStack(spacing: 6) {
-                ForEach(FeedFilter.allCases) { filter in
+                ForEach(visibleFilters) { filter in
                     FilterPill(label: filter.label, isActive: activeFilter == filter) {
                         activeFilter = filter
                     }
@@ -67,6 +69,18 @@ public struct PopoverRootView: View {
                 .stroke(GitPulseColors.border, lineWidth: 0.5)
         )
         .preferredColorScheme(settings?.appearance.colorScheme)
+        .onAppear {
+            ensureActiveFilterVisible(visibleFilters)
+        }
+        .onChange(of: visibleFilters.map(\.rawValue).joined(separator: ",")) { _, _ in
+            ensureActiveFilterVisible(visibleFilters)
+        }
+    }
+
+    private func ensureActiveFilterVisible(_ filters: [FeedFilter]) {
+        if !filters.contains(activeFilter) {
+            activeFilter = .all
+        }
     }
 
     private var appVersion: String {

@@ -4,6 +4,7 @@ import SwiftUI
 enum SettingsSection: String, CaseIterable, Identifiable {
     case general
     case account
+    case notifications
     case polling
     case popover
     case shortcuts
@@ -15,6 +16,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .general: return "General"
         case .account: return "Account"
+        case .notifications: return "Notifications"
         case .polling: return "Polling"
         case .popover: return "Popover"
         case .shortcuts: return "Shortcuts"
@@ -26,6 +28,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .general: return "gearshape"
         case .account: return "person.crop.circle"
+        case .notifications: return "bell"
         case .polling: return "arrow.clockwise"
         case .popover: return "rectangle.bottomthird.inset.filled"
         case .shortcuts: return "keyboard"
@@ -64,6 +67,7 @@ public struct SettingsWindowView: View {
         switch selection ?? .general {
         case .general: GeneralSettingsView()
         case .account: AccountSettingsView()
+        case .notifications: NotificationsSettingsView()
         case .polling: PollingSettingsView()
         case .popover: PopoverSettingsView()
         case .shortcuts: ShortcutsSettingsView()
@@ -153,6 +157,7 @@ private extension SettingsSection {
         switch self {
         case .general: return Color(hex: 0xe3f0ff)
         case .account: return Color(hex: 0xe6f5e6)
+        case .notifications: return Color(hex: 0xfff3e0)
         case .polling: return Color(hex: 0xe6f0ff)
         case .popover: return Color(hex: 0xf0e6ff)
         case .shortcuts: return Color(hex: 0xf5f0e0)
@@ -165,7 +170,7 @@ private extension SettingsSection {
         case .general, .polling: return GitPulseColors.blueBase
         case .popover: return Color(hex: 0x9b59b6)
         case .account: return GitPulseColors.green
-        case .shortcuts: return GitPulseColors.amber
+        case .notifications, .shortcuts: return GitPulseColors.amber
         case .advanced: return GitPulseColors.mutedBadgeText
         }
     }
