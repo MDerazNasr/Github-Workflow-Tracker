@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Assets/GitPulseIcon.svg" alt="GitPulse icon" width="128" height="128">
+</p>
+
 # GitPulse
 
 GitPulse is a macOS menu bar app for tracking GitHub workflow activity without keeping GitHub open all day. It is built with SwiftUI, AppKit menu bar APIs, SwiftData, and GitHub's API.
@@ -120,6 +124,10 @@ Good first contribution areas:
 - Webhook receiver
 - Auto-update support
 - Contributor docs and screenshots
+
+## Release Status
+
+GitPulse is not packaged for end-user downloads yet. The next release milestone is to create a signed and notarized macOS `.app`, wrap it in a DMG, and publish it through GitHub Releases. See `docs/RELEASE.md` for the release checklist.
 
 ## License
 
