@@ -48,6 +48,22 @@ swift test
 
 GitPulse is currently a Swift package executable, not a signed `.app` release bundle. Packaging, signing, notarization, and auto-update distribution still need to be added.
 
+## Packaging A Local DMG
+
+Generate the icon, build the release binary, wrap it in a `.app`, and create a DMG:
+
+```sh
+scripts/package-release.sh 1.0.0
+```
+
+The script writes output to `dist/`. If `SIGN_IDENTITY` is set, it will codesign the app before creating the DMG:
+
+```sh
+SIGN_IDENTITY="Developer ID Application: YOUR NAME (TEAMID)" scripts/package-release.sh 1.0.0
+```
+
+Notarization still needs to be run separately with Apple's `notarytool`.
+
 ## GitHub Token
 
 To use live pull request data, create a GitHub personal access token and connect it in `Settings > Account`.
@@ -131,4 +147,4 @@ GitPulse is not packaged for end-user downloads yet. The next release milestone 
 
 ## License
 
-No license file has been added yet. Add a `LICENSE` file before publishing this as an open source project that other people can freely use, modify, and redistribute.
+GitPulse is released under the MIT License. See `LICENSE`.
