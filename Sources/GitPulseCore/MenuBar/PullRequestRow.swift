@@ -21,7 +21,7 @@ struct PullRequestRow: View {
                             Text("@\(pullRequest.authorLogin)")
                                 .font(GitPulseText.mono(10))
                                 .foregroundColor(GitPulseColors.textMuted)
-                            CountBadge(text: pullRequest.checkStatus.displayName.lowercased(), tone: badgeTone)
+                            CountBadge(text: attentionState.displayName.lowercased(), tone: badgeTone)
                         }
                     }
 
@@ -55,12 +55,25 @@ struct PullRequestRow: View {
     }
 
     private var badgeTone: BadgeTone {
-        switch pullRequest.checkStatus {
-        case .passing: return .green
-        case .failing: return .red
-        case .pending, .expected: return .amber
-        case .unknown: return .gray
+        switch attentionState {
+        case .ready, .checksPassing:
+            return .green
+        case .checksFailed, .changesRequested:
+            return .red
+        case .waitingForChecks:
+            return .amber
+        case .waitingForApproval:
+            return .blue
+        case .unknown:
+            return .gray
         }
+    }
+
+    private var attentionState: PullRequestAttentionState {
+        PullRequestAttentionState.from(
+            checkStatus: pullRequest.checkStatus,
+            reviewStatus: pullRequest.reviewStatus
+        )
     }
 
     private var relativeTime: String {

@@ -66,3 +66,59 @@ public enum PullRequestReviewStatus: String, Codable, CaseIterable, Identifiable
         }
     }
 }
+
+public enum PullRequestAttentionState: String, Codable, CaseIterable, Identifiable, Sendable {
+    case waitingForChecks
+    case waitingForApproval
+    case changesRequested
+    case checksFailed
+    case ready
+    case checksPassing
+    case unknown
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .waitingForChecks: return "Waiting for checks"
+        case .waitingForApproval: return "Waiting for approval"
+        case .changesRequested: return "Changes requested"
+        case .checksFailed: return "Checks failed"
+        case .ready: return "Ready"
+        case .checksPassing: return "Checks passing"
+        case .unknown: return "Status unknown"
+        }
+    }
+
+    public static func from(
+        checkStatus: PullRequestCheckStatus,
+        reviewStatus: PullRequestReviewStatus
+    ) -> PullRequestAttentionState {
+        if reviewStatus == .changesRequested {
+            return .changesRequested
+        }
+
+        switch checkStatus {
+        case .failing:
+            return .checksFailed
+        case .pending, .expected:
+            return .waitingForChecks
+        case .passing:
+            switch reviewStatus {
+            case .reviewRequired:
+                return .waitingForApproval
+            case .approved:
+                return .ready
+            case .unknown:
+                return .checksPassing
+            case .changesRequested:
+                return .changesRequested
+            }
+        case .unknown:
+            if reviewStatus == .reviewRequired {
+                return .waitingForApproval
+            }
+            return .unknown
+        }
+    }
+}

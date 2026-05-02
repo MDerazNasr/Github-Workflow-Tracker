@@ -20,4 +20,18 @@ struct PullRequestStatusTests {
         #expect(PullRequestReviewStatus.fromGraphQLDecision("REVIEW_REQUIRED") == .reviewRequired)
         #expect(PullRequestReviewStatus.fromGraphQLDecision(nil) == .unknown)
     }
+
+    @Test("attention state describes passive waiting states")
+    func attentionStateDescribesPassiveWaitingStates() {
+        #expect(PullRequestAttentionState.from(checkStatus: .pending, reviewStatus: .reviewRequired) == .waitingForChecks)
+        #expect(PullRequestAttentionState.from(checkStatus: .expected, reviewStatus: .approved) == .waitingForChecks)
+        #expect(PullRequestAttentionState.from(checkStatus: .passing, reviewStatus: .reviewRequired) == .waitingForApproval)
+    }
+
+    @Test("attention state prioritizes states that need action")
+    func attentionStatePrioritizesActionableStates() {
+        #expect(PullRequestAttentionState.from(checkStatus: .passing, reviewStatus: .changesRequested) == .changesRequested)
+        #expect(PullRequestAttentionState.from(checkStatus: .failing, reviewStatus: .approved) == .checksFailed)
+        #expect(PullRequestAttentionState.from(checkStatus: .passing, reviewStatus: .approved) == .ready)
+    }
 }
