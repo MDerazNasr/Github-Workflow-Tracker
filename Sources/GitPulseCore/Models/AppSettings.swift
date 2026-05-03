@@ -1,5 +1,7 @@
+import AppKit
 import SwiftData
 import Foundation
+import SwiftUI
 
 @Model
 final class AppSettings {
@@ -38,7 +40,7 @@ final class AppSettings {
     var denseLayout: Bool = false
 
     // MARK: Appearance — popover
-    var popoverWidth: Int = 360
+    var popoverWidth: Int = 420
     /// 10 | 20 | 30 | 0 (unlimited)
     var maxVisibleItems: Int = 20
     var showRelativeTimestamps: Bool = true
@@ -153,8 +155,11 @@ final class AppSettings {
 
     /// Returns true when quiet hours are currently active.
     var isQuietHoursActive: Bool {
+        isQuietHoursActive(atHour: Calendar.current.component(.hour, from: Date()))
+    }
+
+    func isQuietHoursActive(atHour hour: Int) -> Bool {
         guard quietHoursEnabled else { return false }
-        let hour = Calendar.current.component(.hour, from: Date())
         if quietHoursFrom > quietHoursTo {
             return hour >= quietHoursFrom || hour < quietHoursTo
         } else {
@@ -170,6 +175,75 @@ final class AppSettings {
             try? context.save()
         }
     }
+
+    func resetToDefaults() {
+        launchAtLogin = false
+        showInDock = false
+        reopenLastViewOnLaunch = true
+        openLinksIn = "browser"
+        markAsReadOnOpen = true
+        closePopoverAfterOpeningLink = false
+        groupByRepo = true
+        defaultTab = "activity"
+        retentionDaysRead = 30
+        retentionDaysDismissed = 7
+        demoMode = false
+        appearanceMode = "system"
+        accentColor = "system"
+        popoverVibrancy = true
+        fontName = "sf-mono"
+        fontSize = 13
+        denseLayout = false
+        popoverWidth = 420
+        maxVisibleItems = 20
+        showRelativeTimestamps = true
+        showAuthorAvatars = true
+        showCIBranchName = true
+        showCommitSHA = false
+        notificationsEnabled = true
+        respectFocusMode = true
+        notificationSound = "default"
+        groupNotificationsByRepo = true
+        quietHoursEnabled = false
+        quietHoursFrom = 21
+        quietHoursTo = 8
+        autoWatchNewRepos = false
+        autoWatchOrg = ""
+        includeForks = false
+        includeArchivedRepos = false
+        watchReposImAssignedTo = true
+        showOnlyReposWithActivity = true
+        repoHidePattern = ""
+        pollIntervalSeconds = 60
+        pausePollingOnBattery = false
+        pausePollingWhenOffline = true
+        backoffOnRateLimit = true
+        webhookEnabled = false
+        webhookPort = 9876
+        verifyWebhookSignatures = true
+        menuBarIconStyle = "branch"
+        colorCodeIconOnCIStatus = true
+        animateIconWhenCIRunning = true
+        showCountInMenuBar = true
+        menuBarCountType = "unread"
+        hideCountWhenZero = true
+        menuBarCountCap = 99
+        tabPRsEnabled = true
+        tabIssuesEnabled = true
+        tabCICDEnabled = true
+        tabProjectsEnabled = false
+        tabMentionsEnabled = false
+        shortcutOpenPopover = "⌥ Space"
+        shortcutRefresh = "⌥ R"
+        shortcutMarkAllRead = "⌥ M"
+        shortcutOpenSettings = "⌥ ,"
+        logLevel = "errors"
+        writeLogsToFile = false
+        showAPIRequestLog = false
+        simulateSlowNetwork = false
+        forceCIFailureState = false
+        autoUpdate = true
+    }
 }
 
 // MARK: - Supporting enums
@@ -182,6 +256,28 @@ enum AppAppearance: String, CaseIterable, Identifiable {
         case .system: return "System"
         case .light:  return "Light"
         case .dark:   return "Dark"
+        }
+    }
+
+    var nsAppearance: NSAppearance? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return NSAppearance(named: .aqua)
+        case .dark:
+            return NSAppearance(named: .darkAqua)
+        }
+    }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
         }
     }
 }
