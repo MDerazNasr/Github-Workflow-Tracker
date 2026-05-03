@@ -40,6 +40,8 @@ Clone the repo, then run:
 swift run GitPulse
 ```
 
+Local SwiftPM runs use the bundled `GitPulse.icns` resource for the app icon.
+
 Run tests with:
 
 ```sh

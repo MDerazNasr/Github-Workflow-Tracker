@@ -17,6 +17,7 @@ public final class AppState {
     public var rateLimitSummary: String
 
     public init(inMemory: Bool = false, enableGlobalShortcuts: Bool = true) {
+        AppIconService.applyAppIcon()
         gitHubAccount = GitHubAccountService()
 
         let schema = Schema([

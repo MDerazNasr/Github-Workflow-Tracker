@@ -6,10 +6,12 @@ import Foundation
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 let iconsetURL = root.appending(path: ".build/release-assets/GitPulse.iconset")
 let outputURL = root.appending(path: "Assets/GitPulse.icns")
+let resourceURL = root.appending(path: "Sources/GitPulseCore/Resources/GitPulse.icns")
 
 try? FileManager.default.removeItem(at: iconsetURL)
 try FileManager.default.createDirectory(at: iconsetURL, withIntermediateDirectories: true)
 try FileManager.default.createDirectory(at: outputURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+try FileManager.default.createDirectory(at: resourceURL.deletingLastPathComponent(), withIntermediateDirectories: true)
 
 let requiredIcons: [(name: String, pixels: Int)] = [
     ("icon_16x16.png", 16),
@@ -47,7 +49,11 @@ guard process.terminationStatus == 0 else {
     fatalError("iconutil failed with status \(process.terminationStatus)")
 }
 
+try? FileManager.default.removeItem(at: resourceURL)
+try FileManager.default.copyItem(at: outputURL, to: resourceURL)
+
 print("Generated \(outputURL.path)")
+print("Updated \(resourceURL.path)")
 
 private func drawIcon(pixels: Int) -> NSImage {
     let size = NSSize(width: pixels, height: pixels)

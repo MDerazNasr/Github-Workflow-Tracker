@@ -8,4 +8,8 @@ The mark combines a Git-style branch with a pulse line:
 - The pulse line represents live status changes.
 - Green, blue, and purple match the app's status palette.
 
-For a production macOS release, convert this source into an `.icns` file and attach it to the signed `.app` bundle. The current repository is still a Swift package executable, so the icon is stored as source artwork until app bundling is added.
+`GitPulse.icns` is generated from the icon script and is used by local SwiftPM runs and release packaging. Regenerate it with:
+
+```sh
+swift scripts/generate-app-icon.swift
+```

@@ -12,7 +12,12 @@ let package = Package(
         .library(name: "GitPulseCore", targets: ["GitPulseCore"])
     ],
     targets: [
-        .target(name: "GitPulseCore"),
+        .target(
+            name: "GitPulseCore",
+            resources: [
+                .copy("Resources/GitPulse.icns")
+            ]
+        ),
         .executableTarget(
             name: "GitPulseApp",
             dependencies: ["GitPulseCore"]
